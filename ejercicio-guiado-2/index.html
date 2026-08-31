@@ -224,7 +224,7 @@
     <section class="architecture-section"><div class="architecture-heading"><span>14</span><h2>Conclusiones y mejoras futuras</h2></div>
       <div class="architecture-copy">
         <p>El ejercicio permitió llevar el modelo de librería desde el análisis de requisitos hasta un despliegue real en GCP, con PostgreSQL ejecutado y probado de verdad — no solo diseñado en papel. El proceso de correr los scripts contra una base real reveló bugs que la validación estática nunca hubiera encontrado (una restricción de precio incompleta, una configuración de despliegue que rompía las sesiones, y un binding de red inseguro), lo que confirma el valor de las pruebas de integridad reales que exige el enunciado.</p>
-        <p>Mejoras futuras identificadas: completar la conexión de <code>POST/PUT /books</code> a <code>sp_create_book</code>/<code>sp_update_book</code> (ED-11); ampliar la matriz de pruebas a los 22 casos completos con navegador real; agregar TLS si la publicación final lo requiere (lo que reactivaría la necesidad de cookies <code>secure</code>, ver ED-13); y limpiar manualmente la regla de firewall <code>monolito-web</code>, ya inofensiva pero innecesaria.</p>
+        <p>Mejoras futuras identificadas: completar la conexión de <code>POST/PUT /books</code> a <code>sp_create_book</code>/<code>sp_update_book</code> (ED-11); ampliar la matriz de pruebas a los 22 casos completos con navegador real; y agregar TLS si la publicación final lo requiere (lo que reactivaría la necesidad de cookies <code>secure</code>, ver ED-13).</p>
       </div>
     </section>
 

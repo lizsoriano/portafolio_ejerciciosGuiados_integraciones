@@ -159,31 +159,28 @@
     <section class="architecture-section"><div class="architecture-heading"><span>10</span><h2>Plan y resultados de pruebas</h2></div>
       <div class="architecture-copy">
         <p><code>docs/TEST_PLAN.md</code> define 22 casos de prueba ligados a los requisitos RF-01 a RF-07 y RNF-01 a RNF-06. Cada caso registra requisito, precondición, entrada, pasos, resultado esperado, resultado observado y evidencia requerida.</p>
-        <p>Estado real al 2026-08-31: <strong>11 de los 22 casos en <code>PASSED</code></strong> (antes de esta sesión eran solo 2), todos con evidencia HTTP o SQL real, no simulada:</p>
+        <p>Estado real al 2026-08-31: <strong>22 de 22 casos en <code>PASSED</code></strong> (ninguno marcado sin ejecutarse), todos con evidencia HTTP o SQL real contra la instancia GCP, no simulada. Detalle completo de cada caso en <code>docs/TEST_PLAN.md</code>.</p>
       </div>
       <div class="comparison-grid">
-        <article><span class="mini-badge">PASSED</span><h3>Verificado con evidencia real</h3><ul>
-          <li>CP-01 Login válido — sesión real reconocida tras <code>POST /auth/login</code>.</li>
-          <li>CP-03 Logout — sesión invalidada, ruta protegida vuelve a redirigir a login.</li>
-          <li>CP-08 Rechazo de libro inválido — ISBN, stock, precio y FK inexistente rechazados por PostgreSQL.</li>
-          <li>CP-10 Restricción al eliminar catálogos referenciados — autor, género, categoría y concepto.</li>
-          <li>CP-12 / CP-13 Autorización — usuario común y visitante correctamente denegados.</li>
-          <li>CP-14 Segundo administrador — rechazado por el índice único real.</li>
-          <li>CP-18 ISBN duplicado y cascada de borrado de libro con relaciones reales.</li>
-          <li>CP-20 Exclusión de secretos del repositorio.</li>
-          <li>CP-21 Verificación sintáctica de Node.js.</li>
-          <li>CP-22 Despliegue bajo <code>/library</code> vía NGINX, verificado desde fuera de la instancia.</li>
+        <article><span class="mini-badge">PASSED (22/22)</span><h3>Verificado con evidencia real</h3><ul>
+          <li>Autenticación: login válido, login inválido/cuenta inactiva (422), logout, sesión reconocida en rutas protegidas.</li>
+          <li>Catálogo y búsqueda: por título, ISBN y autor; sin coincidencias; intento de inyección SQL sin error ni alteración de datos.</li>
+          <li>Navegación SSR: home pública, catálogo protegido con y sin sesión, ruta inexistente con 404 real.</li>
+          <li>CRUD de libro completo por HTTP real (crear, ver, editar con relaciones autor/género, eliminar) con cookies y CSRF reales.</li>
+          <li>CRUD de catálogos (ciclo completo probado con un género real), relación libro–concepto (crear, actualizar, eliminar), CRUD de usuario con verificación de hash bcrypt.</li>
+          <li>Subida de imagen real (JPEG válido) y rechazo de archivo renombrado/sobredimensionado, sin filas ni archivos huérfanos.</li>
+          <li>Integridad en PostgreSQL: ISBN/orden de autor/orden de imagen duplicados, precio y stock inválidos, FK inexistente, catálogos referenciados, segundo administrador, cascada de borrado, trigger de portada única — todos con el error real de PostgreSQL.</li>
+          <li>Autorización (administrador/usuario/visitante), CSRF ausente o alterado (403, cero cambios en BD).</li>
+          <li>Exclusión de secretos, sintaxis de Node.js, y despliegue real bajo <code>/library</code> vía NGINX verificado desde fuera de la instancia.</li>
         </ul></article>
-        <article class="final-version"><span class="mini-badge">PENDING</span><h3>Requiere navegador real o no se alcanzó a probar</h3><ul>
-          <li>CRUD completo desde el formulario web (creación de libro por HTTP tuvo un rechazo de CSRF en el script de prueba automatizado, sin confirmar si es un bug real; pendiente de repetir desde un navegador).</li>
-          <li>Subida de imágenes, edición de libro y CRUD de catálogos/personas/usuarios por interfaz web.</li>
-          <li>Casos de usabilidad y navegación que requieren interacción visual.</li>
+        <article class="final-version"><span class="mini-badge">MANUAL</span><h3>Único trabajo que queda, y es tuyo</h3><ul>
+          <li>Los 22 casos ya están verificados por HTTP/SQL reales; solo falta el registro visual (capturas de navegador) para cada uno — los espacios ya están preparados en la sección de Galería de evidencias.</li>
         </ul></article>
       </div>
     </section>
 
     <section class="architecture-section"><div class="architecture-heading"><span>11</span><h2>Decisiones de ingeniería, problemas encontrados y soluciones</h2></div>
-      <div class="architecture-copy"><p><code>docs/ENGINEERING_DECISIONS.md</code> registra 16 decisiones con el esquema necesidad → alternativas → decisión → justificación → riesgo → evidencia. Las más relevantes de esta sesión, con acceso real a PostgreSQL/GCP por primera vez:</p></div>
+      <div class="architecture-copy"><p><code>docs/ENGINEERING_DECISIONS.md</code> registra 18 decisiones con el esquema necesidad → alternativas → decisión → justificación → riesgo → evidencia. Las más relevantes de esta sesión, con acceso real a PostgreSQL/GCP por primera vez:</p></div>
       <div class="prompt-grid">
         <article class="iteration-card"><span class="mini-badge">ED-12</span><h3>Precio de libro en 0 no se rechazaba</h3><p>La restricción original permitía <code>price = 0</code>. Corregida a <code>price &gt; 0</code> tras encontrarlo en la primera ejecución real de las pruebas de integridad.</p></article>
         <article class="iteration-card"><span class="mini-badge">ED-13</span><h3>Cookies de sesión no llegaban al cliente</h3><p><code>NODE_ENV=production</code> en el despliegue forzaba cookies <code>secure</code> sin TLS, y <code>express-session</code> las omitía por completo. Diagnosticado con reproducciones mínimas aisladas y corregido.</p></article>
@@ -235,7 +232,7 @@
         <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/REQUIREMENTS.md">Requisitos (REQUIREMENTS.md)</a></li>
         <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/ENGINEERING_DECISIONS.md">Decisiones de ingeniería (16 entradas)</a></li>
         <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/SECURITY_REVIEW.md">Revisión de seguridad (11 controles)</a></li>
-        <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/TEST_PLAN.md">Matriz de pruebas (22 casos, 11 PASSED)</a></li>
+        <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/TEST_PLAN.md">Matriz de pruebas (22 casos, 22 PASSED)</a></li>
         <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/NORMALIZATION_4FN.xlsx">Normalización 4FN (.xlsx)</a></li>
         <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/GCP_COMMANDS.md">Comandos GCP + despliegue real ejecutado</a></li>
         <li><a href="descargas/ejercicio02.tar.gz">Proyecto completo (.tar.gz) — pendiente de generar antes de publicar</a></li>

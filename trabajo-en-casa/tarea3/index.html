@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trabajo en Casa #3 | Ruth Elizabeth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="project-page">
+  <header class="topbar">
+    <a class="brand" href="../../index.html"><span class="brand-mark">✦</span><span>Ruth<br>Elizabeth</span></a>
+    <nav class="main-nav" aria-label="Navegación principal"><a href="../../index.html">Inicio</a><a class="active" aria-current="page" href="../../parcial1.html">Parcial 1</a><a href="../../parcial2.html">Parcial 2</a><a href="../../parcial3.html">Parcial 3</a><a href="../../proyecto.html">Proyecto Final</a><a href="../../sobre-mi.html">Sobre mí</a></nav>
+  </header>
+
+  <main class="project-shell essay-shell">
+    <section class="project-title essay-title">
+      <p class="eyebrow">TRABAJO EN CASA #3 · MINIENSAYO</p>
+      <h1>¿CLOUD-NATIVE O CLOUD-ENABLED?</h1>
+      <span class="script-note">Análisis de una aplicación real</span>
+    </section>
+
+    <article class="cloud-essay">
+      <section class="essay-section">
+        <div class="essay-heading"><span>01</span><h2>Introducción</h2></div>
+        <p>Cuando hablamos de aplicaciones Cloud, muchas veces podemos llegar a pensar que una aplicación es Cloud-Native simplemente porque funciona dentro de la nube, pero realmente la diferencia entre una aplicación Cloud-Native y una Cloud-Enabled va mucho más allá de dónde se encuentra alojada. Lo importante es entender <strong>cómo fue diseñada y cómo utiliza las capacidades que ofrece la nube</strong>.</p>
+        <p>La Cloud Native Computing Foundation relaciona las aplicaciones Cloud-Native con características como contenedores, microservicios, infraestructura inmutable, serverless, APIs declarativas, resiliencia y observabilidad (CNCF, 2024). Por otra parte, una aplicación Cloud-Enabled normalmente es un sistema que fue diseñado originalmente para infraestructura tradicional y posteriormente fue adaptado para funcionar dentro de la nube.</p>
+        <p>Es así que mediante este ensayo me interesa analizar el caso de <strong>Shopify</strong> para determinar si realmente podemos considerarlo Cloud-Native, Cloud-Enabled o incluso una combinación de ambos.</p>
+      </section>
+
+      <section class="essay-section essay-highlight">
+        <div class="essay-heading"><span>02</span><h2>Aplicación seleccionada</h2></div>
+        <p>Shopify es una plataforma SaaS de comercio electrónico utilizada por millones de negocios para administrar sus tiendas en línea. Algo que me llamó bastante la atención al investigar su arquitectura es que, aunque trabaja a una escala enorme, su núcleo sigue utilizando un <strong>monolito modular desarrollado principalmente con Ruby on Rails</strong>.</p>
+        <p>Esto resulta interesante porque muchas veces relacionamos inmediatamente Cloud-Native con microservicios. Sin embargo, Shopify llegó a evaluar una migración hacia microservicios y decidió mantener de manera intencional su arquitectura de monolito modular (Westeinde, 2019).</p>
+        <p>Aun con esta arquitectura, durante Black Friday–Cyber Monday de 2025 Shopify llegó a manejar picos de 489 millones de solicitudes por minuto en el borde y 117 millones en sus servidores de aplicación (Shopify, 2025), por lo que claramente estamos hablando de una plataforma diseñada para soportar una gran cantidad de usuarios.</p>
+      </section>
+
+      <section class="essay-section">
+        <div class="essay-heading"><span>03</span><h2>Análisis tecnológico</h2></div>
+        <p>Aquí es donde podemos comenzar a identificar las características Cloud-Native de Shopify. Para organizar su monolito, Shopify utiliza <strong>Packwerk</strong>, una herramienta que permite establecer fronteras entre diferentes partes del sistema y controlar sus dependencias. De esta forma pueden obtener algunas de las ventajas de los microservicios, como la separación de responsabilidades, sin necesariamente dividir todo el sistema en servicios independientes.</p>
+        <p>Por otra parte, Shopify utiliza <strong>contenedores administrados mediante Kubernetes sobre Google Cloud</strong>, lo que facilita el despliegue y el escalamiento horizontal de la plataforma. Además, su infraestructura sigue un modelo inmutable, es decir, cuando se necesita una nueva versión de un contenedor este se reemplaza en lugar de modificarse directamente (Google Cloud, 2026; Kovyrin, 2024).</p>
+        <p>También podemos encontrar APIs como <strong>Storefront API, Admin API y Customer Account API</strong>, además de webhooks que permiten integrar Shopify con otros sistemas.</p>
+        <p>Otro punto que considero importante es el uso de <strong>Shopify Functions</strong>. Estas permiten ejecutar lógica personalizada mediante WebAssembly dentro de un entorno controlado de Shopify (Shopify Engineering, 2023). Como podemos observar en la Figura 2, la función recibe información, procesa la lógica mediante WebAssembly y posteriormente devuelve un resultado al backend de Shopify.</p>
+        <p>En cuanto a los datos, Shopify utiliza tecnologías como <strong>MySQL, Vitess, Redis, Memcached, Kafka y Elasticsearch</strong>. Su arquitectura por pods divide diferentes grupos de tiendas y sus recursos, tal como podemos observar en la Figura 1. Esto ayuda a que, si ocurre un problema dentro de un pod, no necesariamente se vea afectada toda la plataforma.</p>
+        <p>Finalmente, Shopify también utiliza despliegue continuo, infraestructura como código y herramientas de observabilidad mediante métricas, trazas y bitácoras. Además, realiza pruebas de carga, ejercicios de ingeniería del caos y failovers regionales para comprobar la tolerancia a fallos de la plataforma (Petroski y Frail, 2025).</p>
+      </section>
+
+      <section class="essay-section">
+        <div class="essay-heading"><span>04</span><h2>¿Cloud-Native o Cloud-Enabled?</h2></div>
+        <p>Después de analizar estos elementos, considero que Shopify se puede clasificar como una <strong>arquitectura híbrida con predominio Cloud-Native</strong>.</p>
+        <p>Por un lado, utiliza contenedores, Kubernetes, escalabilidad horizontal, APIs, serverless, observabilidad, automatización y una arquitectura preparada para trabajar de forma distribuida. Sin embargo, su núcleo continúa siendo un monolito modular y no una arquitectura completamente basada en microservicios.</p>
+        <p>Es aquí donde Shopify nos demuestra que ser Cloud-Native no significa obligatoriamente utilizar microservicios para absolutamente todo. Lo importante es aprovechar las características de la nube de acuerdo con las necesidades reales del sistema.</p>
+      </section>
+
+      <section class="essay-section diagrams-section">
+        <div class="essay-heading"><span>05</span><h2>Diagramas de apoyo</h2></div>
+        <div class="essay-figures">
+          <figure class="essay-figure">
+            <img src="../../images/arquitecturaporpods.webp" alt="Arquitectura por pods de Shopify">
+            <figcaption>Figura 1. Arquitectura por pods utilizada por Shopify para aislar recursos y mejorar la escalabilidad y tolerancia a fallos. Fuente: <a href="https://shopify.engineering/a-pods-architecture-to-allow-shopify-to-scale" target="_blank" rel="noopener noreferrer">Shopify Engineering</a>.</figcaption>
+          </figure>
+          <figure class="essay-figure">
+            <img src="../../images/extension-targets-C0IXZY73.webp" alt="Flujo de ejecución de Shopify Functions mediante WebAssembly">
+            <figcaption>Figura 2. Flujo de ejecución de Shopify Functions mediante WebAssembly. Fuente: <a href="https://shopify.dev/docs/apps/build/functions/index" target="_blank" rel="noopener noreferrer">Shopify Developer Documentation</a>.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="essay-section essay-conclusion">
+        <div class="essay-heading"><span>06</span><h2>Conclusiones</h2></div>
+        <p>Mediante este análisis aprendí que la diferencia entre Cloud-Native y Cloud-Enabled no siempre es tan sencilla como parece. Al comenzar la investigación, yo también relacionaba directamente los microservicios con una arquitectura más moderna y madura, pero Shopify demuestra que esto no necesariamente es así.</p>
+        <p>En este caso, mantener un monolito modular no evita que Shopify aproveche contenedores, Kubernetes, escalabilidad horizontal, serverless, observabilidad y tolerancia a fallos.</p>
+        <p>Por lo que podemos decir que Shopify utiliza una combinación de diferentes enfoques y que, aunque conserva algunas características que podríamos considerar tradicionales, la mayor parte de su infraestructura y operación utiliza prácticas Cloud-Native. Al final, considero que la arquitectura correcta no es aquella que utiliza más tecnologías modernas, sino aquella que utiliza las herramientas adecuadas para resolver las necesidades reales del sistema.</p>
+      </section>
+
+      <section class="essay-section references-section">
+        <div class="essay-heading"><span>07</span><h2>Referencias</h2></div>
+        <div class="essay-references">
+          <p>Cloud Native Computing Foundation. (2024). <em>CNCF cloud native definition v1.1</em>. CNCF Technical Oversight Committee.<br><a href="https://github.com/cncf/toc/blob/main/DEFINITION.md" target="_blank" rel="noopener noreferrer">https://github.com/cncf/toc/blob/main/DEFINITION.md</a></p>
+          <p>Google Cloud. (2026). <em>Google Kubernetes Engine documentation</em>.<br><a href="https://cloud.google.com/kubernetes-engine/docs" target="_blank" rel="noopener noreferrer">https://cloud.google.com/kubernetes-engine/docs</a></p>
+          <p>Kovyrin, O. (2024, 16 de junio). <em>Interview: Inside Shopify's modular monolith</em>.<br><a href="https://kovyrin.net/2024/06/16/interview-inside-shopify-monolith/" target="_blank" rel="noopener noreferrer">https://kovyrin.net/2024/06/16/interview-inside-shopify-monolith/</a></p>
+          <p>Petroski, K., y Frail, M. (2025, 20 de noviembre). <em>How we prepare Shopify for BFCM (2025)</em>. Shopify Engineering.<br><a href="https://shopify.engineering/bfcm-readiness-2025" target="_blank" rel="noopener noreferrer">https://shopify.engineering/bfcm-readiness-2025</a></p>
+          <p>Shopify. (2025, 2 de diciembre). <em>Shopify merchants break records with $14.6 billion in Black Friday–Cyber Monday sales</em>. U.S. Securities and Exchange Commission.</p>
+          <p>Shopify Engineering. (2023, 9 de febrero). <em>Bringing JavaScript to WebAssembly for Shopify Functions</em>.<br><a href="https://shopify.engineering/javascript-in-webassembly-for-shopify-functions" target="_blank" rel="noopener noreferrer">https://shopify.engineering/javascript-in-webassembly-for-shopify-functions</a></p>
+          <p>Westeinde, K. (2019, 21 de febrero). <em>Deconstructing the monolith: Designing software that maximizes developer productivity</em>. Shopify Engineering.<br><a href="https://shopify.engineering/deconstructing-monolith-designing-software-maximizes-developer-productivity" target="_blank" rel="noopener noreferrer">https://shopify.engineering/deconstructing-monolith-designing-software-maximizes-developer-productivity</a></p>
+        </div>
+      </section>
+    </article>
+
+    <div class="back-links"><a class="back" href="../../parcial1.html">← regresar a Parcial 1</a><a class="back" href="../../index.html">← regresar al inicio</a></div>
+  </main>
+</body>
+</html>

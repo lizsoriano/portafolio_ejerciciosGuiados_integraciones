@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarea 4 · Arquitectura Cloud + Prompt Engineering | Ruth Elizabeth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="project-page">
+  <header class="topbar"><a class="brand" href="../../index.html"><span class="brand-mark">✦</span><span>Ruth<br>Elizabeth</span></a><nav class="main-nav" aria-label="Navegación principal"><a href="../../index.html">Inicio</a><a class="active" aria-current="page" href="../../parcial1.html">Parcial 1</a><a href="../../parcial2.html">Parcial 2</a><a href="../../parcial3.html">Parcial 3</a><a href="../../proyecto.html">Proyecto Final</a><a href="../../sobre-mi.html">Sobre mí</a></nav></header>
+
+  <main class="project-shell architecture-shell">
+    <section class="project-title architecture-title"><span class="architecture-badge">Tarea 4 · Cloud Computing + IA</span><h1>ARQUITECTURA CLOUD</h1><span class="script-note">+ Prompt Engineering</span><p>Diseño de una arquitectura híbrida para una aplicación de banca móvil utilizando Inteligencia Artificial</p></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>01</span><h2>Descripción del problema</h2></div><div class="architecture-copy"><p>Una institución financiera desea desarrollar una aplicación de banca móvil moderna que permita a sus clientes consultar saldos, realizar transferencias, recibir notificaciones y administrar operaciones desde dispositivos móviles.</p><p>Debido a que la institución ya cuenta con infraestructura bancaria existente, la solución utilizará una arquitectura de nube híbrida. Algunos sistemas críticos permanecerán dentro de la infraestructura local de la institución, mientras que los componentes que requieren mayor escalabilidad y disponibilidad se ejecutarán en AWS.</p><p>La arquitectura debe incluir aplicación móvil, APIs, autenticación, almacenamiento, bases de datos, funciones serverless, monitoreo, seguridad, escalabilidad, alta disponibilidad y comunicación con los sistemas bancarios existentes.</p></div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>02</span><h2>Herramienta de IA utilizada</h2></div><article class="tool-card"><span class="mini-badge">IA</span><h3>Herramienta utilizada</h3><strong>Visual Studio Code + Codex</strong><p>La herramienta de Inteligencia Artificial fue utilizada para proponer la arquitectura inicial, analizar vulnerabilidades, detectar puntos únicos de falla, mejorar la escalabilidad, incorporar observabilidad, diseñar mecanismos de recuperación ante desastres y revisar el prototipo básico del backend.</p></article></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>03</span><h2>Prompt inicial</h2></div><div class="prompt-block"><span class="mini-badge">PROMPT INICIAL</span><p>Actúa como arquitecto de soluciones Cloud. Diseña una arquitectura para una aplicación de banca móvil utilizando una estrategia de nube híbrida.</p><p>La solución deberá incluir aplicación móvil, API Gateway, servicios backend, autenticación, bases de datos, almacenamiento, funciones serverless/FaaS, monitoreo y mecanismos de seguridad.</p><p>Identifica qué componentes deberían permanecer on-premises y cuáles deberían ejecutarse en la nube, justificando cada decisión.</p><p>Propón una arquitectura escalable, tolerante a fallos y altamente disponible.</p><p>Genera un diagrama de arquitectura y desarrolla un prototipo básico del backend. Explica cada componente y las decisiones arquitectónicas realizadas.</p></div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>04</span><h2>Primera arquitectura propuesta</h2></div>
+      <div class="basic-diagram" aria-label="Primera arquitectura propuesta">
+        <div class="basic-entry"><div class="diagram-node">Usuario</div><span class="diagram-arrow">↓</span><div class="diagram-node">Aplicación móvil</div><span class="diagram-arrow">↓</span></div>
+        <div class="basic-zone basic-cloud-zone"><div class="zone-title"><span class="mini-badge">CLOUD</span><h3>AWS CLOUD</h3></div><div class="basic-flow"><div class="diagram-node">Amazon API Gateway</div><span class="diagram-arrow">↓</span><div class="diagram-node">Backend Cloud</div><span class="diagram-arrow">↓</span><div class="diagram-node">AWS Lambda + Amazon Aurora</div></div></div>
+        <div class="basic-connection"><span class="diagram-arrow">↓</span><div class="diagram-node">Conexión On-Premises</div><span class="diagram-arrow">↓</span></div>
+        <div class="basic-zone basic-onprem-zone"><div class="zone-title"><span class="mini-badge">ON-PREMISES</span><h3>ON-PREMISES</h3></div><div class="basic-flow"><div class="diagram-node onprem-node">Core Banking</div><span class="diagram-arrow">↓</span><div class="diagram-node onprem-node">Sistemas bancarios existentes</div></div></div>
+      </div>
+      <div class="problems-panel"><h3>Problemas detectados</h3><ul class="check-list warning-list"><li>No incluía protección suficiente contra ataques web.</li><li>No definía correctamente la autenticación.</li><li>No explicaba claramente la conexión entre AWS y el centro de datos.</li><li>No existía una estrategia completa de monitoreo.</li><li>No había recuperación ante desastres.</li><li>No se protegían explícitamente secretos ni claves.</li><li>Existían posibles puntos únicos de falla.</li><li>No existía una separación clara de redes.</li><li>Faltaba un sistema de notificaciones.</li><li>No se definía con suficiente precisión qué información permanecería on-premises.</li></ul></div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>05</span><h2>Proceso de Prompt Engineering</h2></div><div class="prompt-grid">
+      <article class="iteration-card"><span class="mini-badge">PROMPT 1</span><h3>Seguridad</h3><h4>Prompt</h4><p>Analiza la arquitectura propuesta desde el punto de vista de ciberseguridad para una institución financiera. Identifica vulnerabilidades y agrega mecanismos de protección de APIs, autenticación, cifrado, protección de credenciales, redes privadas y detección de amenazas.</p><h4>Resultado</h4><p>Se incorporaron AWS WAF, Amazon Cognito, AWS KMS, AWS Secrets Manager, IAM con principio de mínimo privilegio, Security Groups, subredes privadas, AWS CloudTrail y Amazon GuardDuty.</p></article>
+      <article class="iteration-card"><span class="mini-badge">PROMPT 2</span><h3>Alta disponibilidad</h3><h4>Prompt</h4><p>Revisa la arquitectura e identifica todos los posibles puntos únicos de falla. Modifica la solución para que pueda continuar funcionando ante la caída de un servidor, zona de disponibilidad o conexión de red.</p><h4>Resultado</h4><p>Se incorporaron múltiples Availability Zones, backend distribuido, Aurora Multi-AZ, conexiones redundantes, Auto Scaling y servicios administrados.</p></article>
+      <article class="iteration-card"><span class="mini-badge">PROMPT 3</span><h3>Escalabilidad</h3><h4>Prompt</h4><p>Optimiza la arquitectura para soportar desde algunos cientos hasta cientos de miles de usuarios simultáneos sin tener que aumentar manualmente la infraestructura.</p><h4>Resultado</h4><p>Se incorporaron Amazon API Gateway, AWS Lambda, Auto Scaling, Amazon CloudFront, Amazon S3 y Amazon ElastiCache cuando sea necesario.</p></article>
+      <article class="iteration-card"><span class="mini-badge">PROMPT 4</span><h3>Observabilidad</h3><h4>Prompt</h4><p>Incorpora una estrategia completa de observabilidad. Necesito conocer errores, latencia, comportamiento de APIs, eventos de seguridad y disponibilidad de los componentes.</p><h4>Resultado</h4><p>Se incorporaron Amazon CloudWatch, AWS CloudTrail, logs, métricas, alarmas, trazabilidad de APIs y alertas de seguridad.</p></article>
+      <article class="iteration-card"><span class="mini-badge">PROMPT 5</span><h3>Recuperación ante desastres</h3><h4>Prompt</h4><p>Diseña una estrategia de recuperación ante desastres para esta aplicación bancaria. Explica cómo proteger bases de datos, archivos y servicios en caso de una falla grave de infraestructura.</p><h4>Resultado</h4><p>Se agregaron backups automáticos, replicación de datos, versionamiento de objetos, copias de seguridad cifradas, recuperación de bases de datos, Infrastructure as Code y una estrategia de recuperación en una región secundaria.</p></article>
+      <article class="iteration-card"><span class="mini-badge">PROMPT 6</span><h3>Costos</h3><h4>Prompt</h4><p>Analiza la arquitectura desde el punto de vista de costos. Reduce recursos innecesarios sin comprometer seguridad, disponibilidad ni rendimiento.</p><h4>Resultado</h4><p>Se priorizaron servicios administrados y serverless para evitar mantener infraestructura activa cuando no sea necesaria.</p><p>AWS Lambda se utiliza principalmente para procesos que se ejecutan bajo demanda.</p></article>
+      <article class="iteration-card"><span class="mini-badge">PROMPT 7</span><h3>Código</h3><h4>Prompt</h4><p>Revisa el backend generado. Identifica problemas de seguridad, validación de datos, manejo de excepciones y exposición de información sensible. Modifica el código para que sea un prototipo más adecuado para una aplicación financiera.</p><h4>Resultado</h4><p>Se incorporaron validaciones, respuestas HTTP apropiadas, manejo de errores, separación de responsabilidades, gestión correcta de secretos y validación antes de operaciones sensibles.</p></article>
+    </div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>06</span><h2>Evolución de la arquitectura</h2></div><div class="comparison-grid"><article><span class="mini-badge">PRIMERA VERSIÓN</span><h3>Arquitectura funcional pero básica.</h3><ul><li>Pocos componentes.</li><li>Seguridad limitada.</li><li>Sin estrategia de DR.</li><li>Monitoreo incompleto.</li><li>Conectividad híbrida poco definida.</li></ul></article><article class="final-version"><span class="mini-badge">VERSIÓN FINAL</span><h3>Arquitectura preparada considerando requisitos reales.</h3><ul><li>Seguridad en varias capas.</li><li>Alta disponibilidad.</li><li>Escalabilidad.</li><li>Observabilidad.</li><li>Recuperación ante desastres.</li><li>Integración híbrida segura.</li><li>Serverless.</li><li>Gestión de identidad.</li></ul></article></div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>07</span><h2>Arquitectura final después del proceso de Prompt Engineering</h2></div>
+      <div class="final-architecture" aria-label="Arquitectura híbrida final">
+        <div class="external-flow"><div class="diagram-node">Usuario</div><span>→</span><div class="diagram-node">Aplicación móvil</div><span>→</span></div>
+        <div class="architecture-zones">
+          <div class="cloud-zone"><div class="zone-title"><span class="mini-badge">CLOUD</span><h3>AWS CLOUD</h3></div><div class="main-cloud-flow"><div class="service-node">Amazon CloudFront</div><span>↓</span><div class="service-node">AWS WAF</div><span>↓</span><div class="service-node">Amazon API Gateway</div><span>↓</span><div class="service-node strong-node">Servicios Backend</div></div><div class="service-groups"><div><h4>Identidad</h4><span><strong>Amazon Cognito</strong><small>Autenticación de usuarios</small></span></div><div><h4>Procesamiento</h4><span><strong>AWS Lambda</strong><small>Funciones Serverless</small></span><span><strong>Servicios Backend</strong></span></div><div><h4>Notificaciones</h4><span><strong>Amazon SNS</strong></span></div><div><h4>Datos</h4><span><strong>Amazon Aurora</strong><small>Base de datos relacional</small></span><span><strong>Amazon S3</strong><small>Almacenamiento de objetos</small></span></div><div><h4>Seguridad</h4><span>AWS KMS</span><span>IAM</span><span>AWS Secrets Manager</span><span>Amazon GuardDuty</span><span>AWS CloudTrail</span></div><div><h4>Observabilidad</h4><span><strong>Amazon CloudWatch</strong></span></div></div></div>
+          <div class="hybrid-bridge"><span class="mini-badge">CONEXIÓN HÍBRIDA</span><strong>AWS Direct Connect</strong><span class="bridge-plus">+</span><strong>VPN de respaldo</strong><span class="bridge-arrow">→</span></div>
+          <div class="onprem-zone"><div class="zone-title"><span class="mini-badge">ON-PREMISES</span><h3>ON-PREMISES</h3></div><div class="onprem-flow"><div class="service-node">Firewall corporativo</div><span>↓</span><div class="service-node">Core Banking</div><span>↓</span><div class="service-node">Sistemas Legacy</div><span>↓</span><div class="service-node strong-node">Datos financieros críticos</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>08</span><h2>Distribución de componentes</h2></div><div class="component-columns"><article><span class="mini-badge">ON-PREMISES</span><h3>Componentes que permanecen On-Premises</h3><div class="component-item"><h4>Core Banking</h4><p>Debe permanecer inicialmente on-premises porque contiene procesos financieros centrales y sistemas existentes cuya migración inmediata podría representar riesgos importantes.</p></div><div class="component-item"><h4>Sistemas Legacy</h4><p>Los sistemas antiguos continúan funcionando dentro de la infraestructura de la institución y son expuestos de manera controlada mediante servicios internos.</p></div><div class="component-item"><h4>Información financiera crítica</h4><p>Determinados datos permanecen dentro de la infraestructura de la institución dependiendo de las políticas internas y requerimientos regulatorios.</p></div></article><article><span class="mini-badge">AWS</span><h3>Componentes ejecutados en AWS</h3><div class="aws-components"><div><h4>Amazon CloudFront</h4><p>Distribución eficiente de contenido y reducción de latencia.</p></div><div><h4>AWS WAF</h4><p>Protección de APIs y servicios frente a tráfico malicioso.</p></div><div><h4>Amazon API Gateway</h4><p>Punto de entrada controlado para las solicitudes provenientes de la aplicación móvil.</p></div><div><h4>Amazon Cognito</h4><p>Autenticación e identidad de usuarios.</p></div><div><h4>AWS Lambda</h4><p>Procesamiento de eventos y operaciones serverless.</p></div><div><h4>Amazon Aurora</h4><p>Base de datos relacional administrada.</p></div><div><h4>Amazon S3</h4><p>Almacenamiento de archivos y objetos.</p></div><div><h4>Amazon SNS</h4><p>Envío de eventos y notificaciones.</p></div><div><h4>Amazon CloudWatch</h4><p>Métricas, logs y alarmas.</p></div><div><h4>AWS CloudTrail</h4><p>Auditoría de actividad dentro de AWS.</p></div><div><h4>AWS KMS</h4><p>Administración de claves utilizadas para cifrado.</p></div><div><h4>AWS Secrets Manager</h4><p>Administración segura de credenciales y secretos.</p></div><div><h4>Direct Connect + VPN</h4><p>Comunicación controlada y redundante entre AWS y la infraestructura local de la institución.</p></div></div></article></div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>09</span><h2>Ejemplo del flujo de una operación</h2></div><div class="operation-flow"><ol><li>El usuario abre la aplicación.</li><li>El usuario inicia sesión.</li><li>Amazon Cognito verifica su identidad.</li><li>La aplicación envía una solicitud HTTPS.</li><li>AWS WAF inspecciona el tráfico.</li><li>Amazon API Gateway recibe la solicitud.</li><li>El backend verifica autorización.</li><li>La solicitud llega de forma segura a la infraestructura on-premises.</li><li>Core Banking consulta el saldo.</li><li>El backend recibe la información.</li><li>API Gateway devuelve la respuesta.</li><li>La aplicación muestra el saldo.</li></ol><p class="important-note"><strong>La aplicación móvil nunca se conecta directamente al Core Banking.</strong></p></div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>10</span><h2>Prototipo Backend — Python + Flask</h2></div><div class="code-window"><div class="code-window-bar"><span>backend/app.py</span><a href="backend/app.py">Ver archivo Python →</a></div><pre><code>from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+usuarios = {
+    "1001": {
+        "nombre": "Juan",
+        "saldo": 15250.75
+    }
+}
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({
+        "status": "ok",
+        "service": "mobile-banking-api"
+    }), 200
+
+
+@app.route("/saldo/&lt;usuario_id&gt;", methods=["GET"])
+def consultar_saldo(usuario_id):
+
+    usuario = usuarios.get(usuario_id)
+
+    if usuario is None:
+        return jsonify({
+            "error": "Usuario no encontrado"
+        }), 404
+
+    return jsonify({
+        "usuario": usuario_id,
+        "nombre": usuario["nombre"],
+        "saldo": usuario["saldo"]
+    }), 200
+
+
+@app.route("/transferencia", methods=["POST"])
+def transferencia():
+
+    datos = request.get_json()
+
+    if not datos:
+        return jsonify({
+            "error": "Solicitud inválida"
+        }), 400
+
+    origen = datos.get("origen")
+    destino = datos.get("destino")
+    monto = datos.get("monto")
+
+    if not origen or not destino or monto is None:
+        return jsonify({
+            "error": "Faltan datos requeridos"
+        }), 400
+
+    try:
+        monto = float(monto)
+    except (ValueError, TypeError):
+        return jsonify({
+            "error": "Monto inválido"
+        }), 400
+
+    if monto &lt;= 0:
+        return jsonify({
+            "error": "El monto debe ser mayor a cero"
+        }), 400
+
+    return jsonify({
+        "mensaje": "Transferencia recibida para procesamiento",
+        "origen": origen,
+        "destino": destino,
+        "monto": monto
+    }), 202
+
+
+if __name__ == "__main__":
+    app.run(debug=True)</code></pre></div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>11</span><h2>Explicación del código</h2></div><div class="architecture-copy"><p>El prototipo contiene tres endpoints principales.</p><div class="endpoint-grid"><article><code>GET /health</code><p>Permite verificar que el servicio se encuentre funcionando correctamente.</p></article><article><code>GET /saldo/&lt;usuario_id&gt;</code><p>Simula la consulta del saldo de un cliente.</p></article><article><code>POST /transferencia</code><p>Recibe una solicitud de transferencia y valida los datos necesarios antes de aceptar la operación.</p></article></div><p>En un ambiente real, el diccionario de usuarios utilizado en este prototipo sería sustituido por servicios internos y bases de datos autorizadas.</p><p>De igual manera, Flask no se ejecutaría utilizando <code>debug=True</code> en un ambiente de producción.</p></div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>12</span><h2>¿Qué modificaría para producción?</h2></div><ul class="production-grid"><li>JWT u otro mecanismo robusto de autenticación y autorización.</li><li>Integración real con Amazon Cognito.</li><li>Base de datos real.</li><li>Comunicación segura con Core Banking.</li><li>Cifrado en tránsito y en reposo.</li><li>Gestión segura de secretos.</li><li>Rate limiting.</li><li>Logs centralizados.</li><li>Auditoría de operaciones.</li><li>Idempotencia en transferencias.</li><li>Validaciones adicionales.</li><li>Pruebas unitarias y de integración.</li><li>Protección frente a operaciones duplicadas.</li><li>Controles antifraude.</li><li>CI/CD.</li><li>Infrastructure as Code.</li><li>Escaneo de vulnerabilidades.</li></ul></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>13</span><h2>Errores detectados</h2></div><div class="error-card-grid"><article><h3>Seguridad insuficiente</h3><p>La primera arquitectura exponía una API sin definir suficientes mecanismos de protección.</p></article><article><h3>Puntos únicos de falla</h3><p>Inicialmente no se consideró qué ocurriría ante la caída de determinados componentes.</p></article><article><h3>Falta de observabilidad</h3><p>No existían inicialmente mecanismos completos de monitoreo, auditoría y alertas.</p></article><article><h3>Conectividad híbrida incompleta</h3><p>La comunicación entre AWS y los sistemas internos no estaba suficientemente definida.</p></article><article><h3>Recuperación ante desastres</h3><p>La primera propuesta no incluía una estrategia clara de recuperación.</p></article><article><h3>Backend demasiado básico</h3><p>El código necesitaba más validaciones y controles antes de poder considerarse cercano a producción.</p></article></div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>14</span><h2>Mejoras realizadas</h2></div><ul class="improvement-tags"><li>Autenticación centralizada.</li><li>AWS WAF.</li><li>Cifrado.</li><li>Gestión segura de secretos.</li><li>Alta disponibilidad.</li><li>Serverless.</li><li>Escalabilidad.</li><li>Conexión híbrida redundante.</li><li>Logging.</li><li>Auditoría.</li><li>Monitoreo.</li><li>Recuperación ante desastres.</li><li>Backups.</li><li>Separación Cloud / On-Premises.</li></ul></section>
+
+    <section class="architecture-section evidence-gallery-section"><div class="architecture-heading"><span>15</span><h2>Evidencias</h2></div>
+      <div class="evidence-group"><h3>1. Prompt Engineering</h3><div class="real-evidence-grid">
+        <figure class="real-evidence"><h4>Prompt inicial</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/promtpinicial.jpeg" aria-label="Ampliar evidencia: Prompt inicial"><img src="../../images/promtpinicial.jpeg" alt="Prompt inicial utilizado en Codex para la arquitectura híbrida" loading="lazy"></button><figcaption>Prompt inicial utilizado para generar la primera propuesta de arquitectura híbrida.</figcaption></figure>
+        <figure class="real-evidence"><h4>Seguridad</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/promptseguridad.jpeg" aria-label="Ampliar evidencia: Seguridad"><img src="../../images/promptseguridad.jpeg" alt="Iteración de seguridad de la arquitectura en Codex" loading="lazy"></button><figcaption>Iteración enfocada en identificar vulnerabilidades y mejorar la seguridad de la arquitectura.</figcaption></figure>
+        <figure class="real-evidence"><h4>Alta disponibilidad</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/promptaltadisponibildad.jpeg" aria-label="Ampliar evidencia: Alta disponibilidad"><img src="../../images/promptaltadisponibildad.jpeg" alt="Revisión de alta disponibilidad y puntos únicos de falla" loading="lazy"></button><figcaption>Revisión de puntos únicos de falla y mecanismos de alta disponibilidad.</figcaption></figure>
+        <figure class="real-evidence"><h4>Escalabilidad</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/promptescalabilidad.jpeg" aria-label="Ampliar evidencia: Escalabilidad"><img src="../../images/promptescalabilidad.jpeg" alt="Iteración de escalabilidad de la arquitectura" loading="lazy"></button><figcaption>Iteración destinada a mejorar la capacidad del sistema para responder ante aumentos de usuarios y tráfico.</figcaption></figure>
+        <figure class="real-evidence"><h4>Observabilidad</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/promptobersavilidad.jpeg" aria-label="Ampliar evidencia: Observabilidad"><img src="../../images/promptobersavilidad.jpeg" alt="Iteración de observabilidad, monitoreo y auditoría" loading="lazy"></button><figcaption>Incorporación de monitoreo, logs, métricas, auditoría y alertas.</figcaption></figure>
+        <figure class="real-evidence"><h4>Recuperación ante desastres</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/promptrecuperacionantidesastres.jpeg" aria-label="Ampliar evidencia: Recuperación ante desastres"><img src="../../images/promptrecuperacionantidesastres.jpeg" alt="Iteración de recuperación ante desastres" loading="lazy"></button><figcaption>Análisis de backups, replicación y estrategias de recuperación ante fallas graves.</figcaption></figure>
+        <figure class="real-evidence"><h4>Revisión del código</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/promptrevisiondecodigo.jpeg" aria-label="Ampliar evidencia: Revisión del código"><img src="../../images/promptrevisiondecodigo.jpeg" alt="Revisión de seguridad y validaciones del código backend" loading="lazy"></button><figcaption>Revisión del backend desde el punto de vista de seguridad, validación y preparación para producción.</figcaption></figure>
+      </div></div>
+      <div class="evidence-group"><h3>2. Código generado y mejorado</h3><div class="real-evidence-grid single-evidence-grid"><figure class="real-evidence"><h4>Prototipo del backend en Flask</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/app.py.jpeg" aria-label="Ampliar evidencia: Prototipo del backend en Flask"><img src="../../images/app.py.jpeg" alt="Código del prototipo backend app.py desarrollado con Flask" loading="lazy"></button><figcaption>Código del prototipo utilizado para implementar los endpoints de health check, consulta de saldo y transferencia.</figcaption></figure></div></div>
+      <div class="evidence-group"><h3>3. Pruebas del backend</h3><div class="real-evidence-grid">
+        <figure class="real-evidence"><h4>Health Check</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/health.jpeg" aria-label="Ampliar evidencia: Health Check"><img src="../../images/health.jpeg" alt="Prueba del endpoint GET health del backend" loading="lazy"></button><figcaption>Prueba del endpoint GET /health verificando que el servicio se encuentra disponible.</figcaption></figure>
+        <figure class="real-evidence"><h4>Consulta de saldo</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/saldo.jpeg" aria-label="Ampliar evidencia: Consulta de saldo"><img src="../../images/saldo.jpeg" alt="Prueba del endpoint GET saldo 1001" loading="lazy"></button><figcaption>Prueba del endpoint GET /saldo/1001 utilizada para simular la consulta de información de un cliente.</figcaption></figure>
+        <figure class="real-evidence"><h4>Transferencia</h4><button class="evidence-image-button" type="button" data-lightbox="../../images/transferencia.jpeg" aria-label="Ampliar evidencia: Transferencia"><img src="../../images/transferencia.jpeg" alt="Prueba del endpoint POST transferencia desde PowerShell" loading="lazy"></button><figcaption>Prueba del endpoint POST /transferencia realizada desde PowerShell enviando una operación de ejemplo.</figcaption></figure>
+      </div></div>
+    </section>
+
+    <section class="architecture-section reflection-section"><div class="architecture-heading"><span>16</span><h2>Reflexión individual</h2></div><article class="reflection-paper"><h3>Aprendiendo sobre el uso de IA para diseñar una arquitectura Cloud</h3><p>Cuando hablamos de Inteligencia Artificial en la actualidad, muchas veces podemos llegar a pensar que simplemente basta con escribir un prompt, esperar unos cuantos segundos y aceptar la respuesta que nos da la herramienta. Sin embargo, mediante esta actividad pude darme cuenta de que cuando hablamos de algo tan importante como la arquitectura de una aplicación bancaria, las cosas no son tan sencillas. La IA puede ser una herramienta bastante útil para ayudarnos a generar ideas y detectar cosas que probablemente no habíamos considerado, pero al final nosotros como ingenieros seguimos teniendo la responsabilidad de analizar si realmente lo que propone tiene sentido.</p>
+      <h4>Prompt Engineering y cómo fue cambiando la solución</h4><p>Al generar la primera arquitectura, la IA propuso una solución bastante sencilla que incluía la aplicación móvil, un API Gateway, servicios backend, una base de datos y comunicación con los sistemas internos del banco. A simple vista podía parecer suficiente, pero al comenzar a realizar prompts más específicos me fui dando cuenta de que todavía faltaban muchas cosas.</p><p>Por ejemplo, cuando le pedí que analizara la arquitectura desde el punto de vista de seguridad comenzaron a aparecer elementos como AWS WAF, Amazon Cognito, KMS, Secrets Manager y sistemas de monitoreo. Después, al preguntarle acerca de disponibilidad y puntos únicos de falla, la solución cambió nuevamente para considerar redundancia, múltiples zonas de disponibilidad y mecanismos de recuperación ante desastres.</p><p>Esto me ayudó a entender que entre más específica sea nuestra pregunta, más útil puede ser la respuesta de la IA. Es parecido a cuando le preguntas a alguien “¿mi computadora está bien?” y probablemente solo te diga que sí, pero si preguntas específicamente “¿mi computadora puede correr cierto videojuego con estas características?”, entonces la respuesta puede ser mucho más precisa.</p>
+      <h4>¿La primera arquitectura realmente era adecuada?</h4><p>En mi opinión, no completamente. La primera arquitectura servía como una base para comenzar, pero tenía varias omisiones importantes. Uno de los problemas principales era que no profundizaba lo suficiente en temas de seguridad, algo que resulta especialmente grave si estamos hablando de una institución financiera.</p><p>Imaginemos que una aplicación bancaria estuviera construida únicamente pensando en que los usuarios pudieran consultar su saldo y realizar transferencias, pero nadie hubiera pensado en qué ocurre si alguien intenta realizar miles de solicitudes maliciosas al sistema o consigue acceder a alguna contraseña almacenada incorrectamente. Aunque técnicamente la aplicación podría “funcionar”, claramente no podríamos considerarla una buena arquitectura.</p>
+      <h4>Seguridad y errores encontrados</h4><p>Uno de los aprendizajes que considero más importantes fue darme cuenta de que la seguridad no debe agregarse hasta el final, sino que debe formar parte de la arquitectura desde el principio.</p><p>Durante las diferentes iteraciones se detectaron problemas como falta de protección de las APIs, ausencia de un sistema de autenticación suficientemente definido, falta de mecanismos de auditoría y poca claridad sobre la conexión entre AWS y los sistemas que permanecerían dentro del banco.</p><p>Es así que la arquitectura terminó incluyendo herramientas como Amazon Cognito para autenticación, AWS WAF para proteger las APIs, CloudTrail para registrar acciones realizadas dentro de AWS y Secrets Manager para evitar guardar contraseñas directamente dentro del código.</p>
+      <h4>¿Comprendo realmente el código generado?</h4><p>En cuanto al código, considero que es muy importante no cometer el error de pensar que porque un código generado por IA funciona significa automáticamente que está listo para utilizarse en producción.</p><p>El prototipo realizado permite consultar información y recibir solicitudes de transferencia, pero todavía existen muchas cosas que tendrían que agregarse en un sistema bancario real, como autenticación, autorización, conexión con una base de datos segura, prevención de transferencias duplicadas, auditoría y controles antifraude.</p><p>Por ejemplo, sería parecido a realizar una página sencilla para una tienda donde puedes agregar productos al carrito. Puede funcionar perfectamente como demostración, pero eso no significa que ya estés listo para almacenar tarjetas de crédito de miles de clientes.</p>
+      <h4>Validación y papel del ingeniero</h4><p>Otro punto importante fue aprender que no debemos aceptar automáticamente las recomendaciones de la IA. Para validar la arquitectura fue necesario revisar para qué servía cada servicio y preguntarnos si realmente tenía sentido agregarlo.</p><p>Aquí es donde considero que entra uno de los papeles más importantes de un Ingeniero en Tecnologías Computacionales. Debemos contar con conocimientos de programación, redes, bases de datos, arquitectura y seguridad para ser capaces de identificar cuándo una propuesta es correcta y cuándo únicamente parece convincente.</p><p>La IA puede ayudarnos a generar código inicial, recomendar servicios, encontrar posibles errores e incluso ayudarnos a documentar una solución, pero decisiones importantes relacionadas con seguridad, información financiera, riesgos y puesta en producción deberían mantenerse bajo responsabilidad humana.</p>
+      <h3>Conclusiones</h3><p>Mediante esta actividad aprendí que utilizar Inteligencia Artificial no significa simplemente aceptar la primera respuesta que obtenemos. El Prompt Engineering puede ayudar bastante a mejorar una solución si sabemos realizar preguntas más específicas y analizar cada respuesta que recibimos.</p><p>También comprendí que una arquitectura Cloud no se trata solamente de conectar diferentes servicios, sino de considerar factores como seguridad, disponibilidad, escalabilidad, monitoreo y recuperación ante fallos.</p><p>Finalmente, considero que la IA puede convertirse en una herramienta bastante poderosa para nosotros como futuros ingenieros, pero únicamente cuando contamos con los conocimientos necesarios para revisar lo que genera. Una persona sin bases sólidas podría obtener una arquitectura que visualmente parece completa y aun así no detectar errores importantes.</p><p>Por lo que puedo decir que el verdadero valor de la IA no está en reemplazar al ingeniero, sino en permitirnos trabajar de una manera más rápida y explorar diferentes soluciones, mientras nosotros seguimos siendo responsables de comprender, revisar, probar, validar, corregir y justificar las decisiones que finalmente se utilicen.</p></article></section>
+
+    <section class="architecture-section activity-conclusion"><div class="architecture-heading"><span>17</span><h2>Conclusiones de la actividad</h2></div><p>La actividad permitió observar cómo una arquitectura generada inicialmente con ayuda de Inteligencia Artificial puede evolucionar considerablemente mediante Prompt Engineering. Las diferentes iteraciones permitieron detectar problemas de seguridad, disponibilidad, escalabilidad, monitoreo y recuperación ante desastres.</p><p>La versión final no solamente conecta servicios Cloud, sino que busca justificar el papel de cada componente y separar adecuadamente la infraestructura Cloud de los sistemas bancarios que permanecen on-premises.</p><p>El principal aprendizaje fue comprender que la IA puede ayudar a diseñar y analizar soluciones, pero la responsabilidad de revisar, validar y justificar las decisiones continúa siendo del ingeniero.</p></section>
+
+    <p class="integrity-note">Doy mi palabra que he realizado esta actividad con integridad académica.</p>
+    <div class="back-links"><a class="back" href="../../parcial1.html">← regresar a Parcial 1</a><a class="back" href="../../index.html">← regresar al inicio</a></div>
+  </main>
+  <div class="evidence-lightbox" id="evidence-lightbox" role="dialog" aria-modal="true" aria-label="Vista ampliada de evidencia" hidden><button class="lightbox-close" type="button" aria-label="Cerrar imagen ampliada">Cerrar ×</button><img src="" alt="Evidencia ampliada"><button class="lightbox-backdrop" type="button" aria-label="Cerrar imagen ampliada"></button></div>
+  <script>
+    (() => {
+      const lightbox = document.getElementById("evidence-lightbox");
+      const fullImage = lightbox.querySelector("img");
+      const closeButton = lightbox.querySelector(".lightbox-close");
+      const backdrop = lightbox.querySelector(".lightbox-backdrop");
+      let trigger = null;
+      const closeLightbox = () => { lightbox.hidden = true; fullImage.src = ""; document.body.classList.remove("lightbox-open"); if (trigger) trigger.focus(); };
+      document.querySelectorAll("[data-lightbox]").forEach((button) => button.addEventListener("click", () => { trigger = button; fullImage.src = button.dataset.lightbox; fullImage.alt = button.querySelector("img").alt; lightbox.hidden = false; document.body.classList.add("lightbox-open"); closeButton.focus(); }));
+      closeButton.addEventListener("click", closeLightbox);
+      backdrop.addEventListener("click", closeLightbox);
+      document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !lightbox.hidden) closeLightbox(); });
+    })();
+  </script>
+</body>
+</html>

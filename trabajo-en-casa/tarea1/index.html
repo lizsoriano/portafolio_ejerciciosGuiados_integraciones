@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarea 1 · Python | Ruth Elizabeth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="project-page evidence-page">
+  <header class="topbar">
+    <a class="brand" href="../../index.html"><span class="brand-mark">✦</span><span>Ruth<br>Elizabeth</span></a>
+    <nav class="main-nav"><a href="../../index.html">Inicio</a><a class="active" href="../../parcial1.html">Parcial 1</a><a href="../../parcial2.html">Parcial 2</a><a href="../../parcial3.html">Parcial 3</a><a href="../../proyecto.html">Proyecto Final</a><a href="../../sobre-mi.html">Sobre mí</a></nav>
+  </header>
+  <main class="project-shell">
+    <section class="project-title"><h1>PYTHON</h1><span class="script-note">clasificación de modelos Cloud</span></section>
+
+    <section class="project-grid">
+      <article class="project-copy">
+        <span class="meta">Trabajo en Casa · Tarea 1</span>
+        <h2 class="content-heading">Presentación</h2>
+        <p>En esta actividad desarrollé un <strong>clasificador de modelos de servicios Cloud</strong> utilizando Python.</p>
+        <p>El programa analiza una descripción escrita por el usuario e identifica si corresponde a <strong>IaaS, PaaS, SaaS o FaaS</strong>.</p>
+        <p>El proyecto cuenta con interfaz gráfica, interfaz de línea de comandos y pruebas automáticas.</p>
+      </article>
+      <aside class="visual">
+        <span class="hand-note">interfaz del proyecto ↘</span>
+        <div class="visual-card evidence-main"><img src="../../images/python-gui.png.jpg" alt="Interfaz gráfica del clasificador de modelos Cloud"></div>
+      </aside>
+    </section>
+
+    <section class="academic-section">
+      <div class="academic-heading"><span>01</span><h2>ARQUITECTURA</h2></div>
+      <div class="academic-two-columns">
+        <div>
+          <p>El proyecto fue dividido en diferentes archivos para separar correctamente las responsabilidades.</p>
+          <div class="file-card"><strong>classifier.py</strong><p>Contiene la lógica principal del clasificador, procesamiento de texto, reglas, puntuaciones y detección del modelo Cloud.</p></div>
+          <div class="file-card"><strong>gui.py</strong><p>Contiene la interfaz gráfica realizada con Tkinter y utiliza la función <code>classify_text()</code>.</p></div>
+          <div class="file-card"><strong>cli.py</strong><p>Implementa una interfaz de línea de comandos utilizando <code>argparse</code>.</p></div>
+          <div class="file-card"><strong>test_classifier.py</strong><p>Contiene las pruebas automáticas del clasificador utilizando <code>unittest</code>.</p></div>
+        </div>
+        <div class="paper-note"><span class="paper-star">✦</span><h3>Objetivo</h3><p>Mantener la lógica del clasificador independiente de las interfaces.</p><p>De esta forma la GUI y la CLI reutilizan exactamente la misma función de clasificación.</p><span class="paper-heart">♡</span></div>
+      </div>
+    </section>
+
+    <section class="academic-section">
+      <div class="academic-heading"><span>✦</span><h2>CÓDIGO FUENTE</h2></div>
+      <div class="project-outline">
+        <a class="outline-paper" href="codigo/classifier.py" target="_blank" rel="noopener">
+          <span>01</span><h2>classifier.py</h2><p>Lógica, NLP y clasificación →</p>
+        </a>
+        <a class="outline-paper" href="codigo/gui.py" target="_blank" rel="noopener">
+          <span>02</span><h2>gui.py</h2><p>Interfaz gráfica Tkinter →</p>
+        </a>
+        <a class="outline-paper" href="codigo/cli.py" target="_blank" rel="noopener">
+          <span>03</span><h2>cli.py</h2><p>Interfaz CLI con argparse →</p>
+        </a>
+        <a class="outline-paper" href="codigo/test_classifier.py" target="_blank" rel="noopener">
+          <span>04</span><h2>test_classifier.py</h2><p>Pruebas unittest →</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="academic-section">
+      <div class="academic-heading"><span>02</span><h2>PROCESAMIENTO NLP</h2></div>
+      <p class="section-intro">Antes de clasificar el servicio Cloud, el texto pasa por diferentes etapas de procesamiento.</p>
+      <div class="nlp-flow">
+        <div><span>01</span>Minúsculas</div><div><span>02</span>Eliminar acentos</div><div><span>03</span>Limpiar puntuación</div>
+        <div><span>04</span>Tokenización</div><div><span>05</span>Stopwords</div><div><span>06</span>Stemming</div>
+        <div><span>07</span>Conceptos</div><div><span>08</span>Reglas Regex</div><div><span>09</span>Puntuación</div>
+      </div>
+      <p class="section-note">Todo el procesamiento fue realizado sin utilizar librerías externas como NLTK o spaCy.</p>
+    </section>
+
+    <section class="evidence-section">
+      <div class="evidence-text"><span class="meta">Evidencia 01</span><h2>CLI</h2><p>La interfaz de línea de comandos utiliza <code>argparse</code> para recibir el nombre, apellido y descripción del servicio Cloud.</p><p>La descripción <strong>“maquinas virtuales almacenamiento redes”</strong> fue clasificada como <strong>IaaS</strong> con puntuación de <strong>15</strong>.</p></div>
+      <div class="evidence-image"><img src="../../images/python-cli.png.jpg" alt="Ejecución de la interfaz CLI"></div>
+    </section>
+
+    <section class="evidence-section reverse">
+      <div class="evidence-text"><span class="meta">Evidencia 02</span><h2>PRUEBAS</h2><p>Se implementaron seis pruebas automáticas con <code>unittest</code> para IaaS, PaaS, SaaS, FaaS, texto vacío y un caso sin suficiente evidencia.</p><p>Las seis pruebas terminaron correctamente con resultado <strong>OK</strong>.</p></div>
+      <div class="evidence-image"><img src="../../images/python-pruebas.png.jpg" alt="Pruebas automáticas del clasificador"></div>
+    </section>
+
+    <section class="evidence-section">
+      <div class="evidence-text"><span class="meta">Evidencia 03</span><h2>GUI</h2><p>La interfaz gráfica fue desarrollada con <strong>Tkinter</strong>. Permite capturar nombre, apellido y descripción del servicio Cloud.</p><p>Después de clasificar muestra el modelo identificado, puntuación y conceptos encontrados.</p></div>
+      <div class="evidence-image"><img src="../../images/python-gui.png.jpg" alt="Interfaz gráfica Tkinter"></div>
+    </section>
+
+    <section class="evidence-section reverse">
+      <div class="evidence-text"><span class="meta">Evidencia 04</span><h2>VALIDACIÓN DE SINTAXIS</h2><p>Se utilizó <code>py_compile</code> para comprobar que <strong>classifier.py · gui.py · cli.py · test_classifier.py</strong> tuvieran sintaxis válida.</p><p>El comando terminó sin mostrar errores.</p></div>
+      <div class="evidence-image"><img src="../../images/python-sintaxis.png.jpg" alt="Validación de sintaxis Python"></div>
+    </section>
+
+    <section class="academic-section test-cases-section">
+      <div class="academic-heading"><span>✦</span><h2>CASOS DE PRUEBA</h2></div>
+      <div class="test-table-wrap">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th scope="col">Entrada</th>
+              <th scope="col">Resultado esperado</th>
+              <th scope="col">Resultado obtenido</th>
+              <th scope="col">¿Correcto?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Necesito maquinas virtuales almacenamiento y redes configurables para instalar mi propio sistema operativo</td><td>IaaS</td><td>IaaS — 19 puntos</td><td>Sí</td></tr>
+            <tr><td>Quiero desplegar mi aplicacion web sin administrar directamente servidores ni sistemas operativos</td><td>PaaS</td><td>PaaS — 19 puntos</td><td>Sí</td></tr>
+            <tr><td>Los empleados utilizan una aplicacion de correo electronico directamente desde el navegador y pagan una suscripcion mensual</td><td>SaaS</td><td>SaaS — 24 puntos</td><td>Sí</td></tr>
+            <tr><td>Necesito ejecutar una funcion automaticamente cada vez que un usuario suba una imagen al almacenamiento Cloud</td><td>FaaS</td><td>FaaS — 13 puntos</td><td>Sí</td></tr>
+            <tr><td>Quiero utilizar tecnologia para mejorar mi empresa</td><td>No clasificado</td><td>No clasificado — 0 puntos</td><td>Sí</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="academic-section">
+      <div class="academic-heading"><span>03</span><h2>RESULTADOS</h2></div>
+      <div class="results-grid"><div><span>IaaS</span><strong>✓</strong></div><div><span>PaaS</span><strong>✓</strong></div><div><span>SaaS</span><strong>✓</strong></div><div><span>FaaS</span><strong>✓</strong></div></div>
+    </section>
+
+    <section class="academic-section">
+      <div class="academic-heading"><span>04</span><h2>ERRORES ENCONTRADOS</h2></div>
+      <div class="file-card">
+        <strong>01 · Dependencia de palabras clave</strong>
+        <p>La primera versión dependía principalmente de palabras clave y expresiones regulares (Regex), por lo que las variaciones en mayúsculas, acentos o formas de las palabras podían afectar la detección.</p>
+      </div>
+      <div class="file-card">
+        <strong>02 · Entradas vacías</strong>
+        <p>Fue necesario validar las entradas vacías para evitar intentar clasificar texto sin información suficiente.</p>
+      </div>
+      <div class="file-card">
+        <strong>03 · Evidencia insuficiente</strong>
+        <p>Algunas descripciones pueden no contener evidencia suficiente para identificar IaaS, PaaS, SaaS o FaaS. Para estos casos se agregó el resultado <em>“No clasificado”</em>.</p>
+      </div>
+      <div class="file-card">
+        <strong>04 · Stemming básico</strong>
+        <p>El stemming implementado es básico y está basado en reglas, por lo que puede producir coincidencias aproximadas y no tiene la precisión de herramientas de procesamiento de lenguaje natural más avanzadas.</p>
+      </div>
+      <div class="file-card">
+        <strong>05 · Conceptos relacionados</strong>
+        <p>Algunos conceptos relacionados pueden aparecer simultáneamente, por ejemplo, <em>“máquinas virtuales”</em>, <em>“máquina”</em> y <em>“virtual”</em>. Esto no impide la clasificación, pero representa una limitación del sistema de conceptos.</p>
+      </div>
+      <p class="section-note">Después de aplicar las correcciones, las seis pruebas automatizadas finalizaron con resultado OK y no quedaron errores críticos de ejecución.</p>
+    </section>
+
+    <section class="academic-section">
+      <div class="academic-heading"><span>05</span><h2>MEJORAS REALIZADAS</h2></div>
+      <div class="file-card">
+        <strong>01 · Separación de responsabilidades</strong>
+        <p>Se separó la lógica del clasificador de la interfaz gráfica: <code>classifier.py</code> concentra la lógica y <code>gui.py</code> contiene únicamente la interfaz desarrollada con Tkinter.</p>
+      </div>
+      <div class="file-card">
+        <strong>02 · CLI independiente</strong>
+        <p>Se creó una interfaz de línea de comandos con <code>argparse</code>. Tanto <code>gui.py</code> como <code>cli.py</code> reutilizan exactamente la función <code>classify_text()</code>.</p>
+      </div>
+      <div class="file-card">
+        <strong>03 · Procesamiento de texto</strong>
+        <p>Se incorporaron conversión a minúsculas, eliminación de acentos, limpieza de puntuación, normalización de espacios, tokenización, eliminación de stopwords, stemming básico y detección de conceptos relevantes.</p>
+      </div>
+      <div class="file-card">
+        <strong>04 · Reglas y puntuaciones</strong>
+        <p>Se conservaron las reglas Regex y se combinaron con puntuaciones obtenidas a partir de los conceptos procesados.</p>
+      </div>
+      <div class="file-card">
+        <strong>05 · Validación de datos</strong>
+        <p>Se agregó validación de datos y manejo de entradas vacías.</p>
+      </div>
+      <div class="file-card">
+        <strong>06 · Resultado sin evidencia</strong>
+        <p>Se incorporó el resultado <em>“No clasificado”</em> cuando no existe evidencia suficiente.</p>
+      </div>
+      <div class="file-card">
+        <strong>07 · Pruebas automatizadas</strong>
+        <p>Se añadieron pruebas con <code>unittest</code> para IaaS, PaaS, SaaS, FaaS, texto vacío y casos sin evidencia suficiente.</p>
+      </div>
+      <div class="file-card">
+        <strong>08 · CLI y validación de sintaxis</strong>
+        <p>Se añadió la CLI y se comprobó mediante <code>py_compile</code> la sintaxis de <code>classifier.py</code>, <code>gui.py</code>, <code>cli.py</code> y <code>test_classifier.py</code>.</p>
+      </div>
+      <div class="file-card">
+        <strong>09 · Documentación</strong>
+        <p>Se documentó el proyecto en <code>README.md</code>, incluyendo arquitectura, ejecución, procesamiento NLP, pruebas y limitaciones.</p>
+      </div>
+    </section>
+
+    <section class="conclusion-card">
+      <span class="conclusion-decoration">✦ ♡ ✦</span><h2>CONCLUSIÓN</h2>
+      <p>La actividad permitió desarrollar un clasificador modular capaz de identificar diferentes modelos de servicios Cloud.</p>
+      <p>La separación entre la lógica, la interfaz gráfica y la CLI facilita el mantenimiento y permite reutilizar el mismo clasificador desde diferentes interfaces.</p>
+      <p>Como posible mejora futura se podría utilizar un sistema de procesamiento de lenguaje natural más avanzado y ampliar las reglas y conceptos.</p>
+    </section>
+    <div class="back-links"><a class="back" href="../../parcial1.html">← regresar a Parcial 1</a><a class="back" href="../../index.html">← regresar al inicio</a></div>
+  </main>
+</body>
+</html>

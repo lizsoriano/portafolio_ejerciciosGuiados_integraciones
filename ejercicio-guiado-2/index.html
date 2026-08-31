@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio Guiado 2 · Librería Web | Ruth Elizabeth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="../styles.css">
+</head>
+<body class="project-page">
+  <header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">✦</span><span>Ruth<br>Elizabeth</span></a><nav class="main-nav" aria-label="Navegación principal"><a href="../index.html">Inicio</a><a class="active" aria-current="page" href="../parcial1.html">Parcial 1</a><a href="../parcial2.html">Parcial 2</a><a href="../parcial3.html">Parcial 3</a><a href="../proyecto.html">Proyecto Final</a><a href="../sobre-mi.html">Sobre mí</a></nav></header>
+
+  <main class="project-shell architecture-shell">
+    <section class="project-title architecture-title">
+      <span class="architecture-badge">Ejercicio Guiado 02 · Integración de Aplicaciones Computacionales</span>
+      <h1>LIBRERÍA WEB</h1>
+      <span class="script-note">monolito Node.js + PostgreSQL, desplegado en GCP</span>
+      <p>Aplicación web monolítica server-side para la gestión de una librería en línea: catálogo normalizado hasta 4FN, autenticación, roles, imágenes y conceptos por libro. Desplegada en Google Cloud Platform (Compute Engine, CentOS Stream 10) detrás de un reverse proxy NGINX bajo el prefijo <code>/library</code>.</p>
+      <ul class="production-grid" style="margin-top:22px">
+        <li><strong>Nombre:</strong> Ruth Elizabeth Soriano Barrera</li>
+        <li><strong>Matrícula:</strong> 637044</li>
+        <li><strong>Grupo y hora:</strong> Martes de 2:30 a 4:00 pm</li>
+        <li><strong>Fecha:</strong> 31 de agosto de 2026</li>
+      </ul>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>01</span><h2>Objetivo y alcance</h2></div><div class="architecture-copy">
+      <p>Diseñar, construir, probar, desplegar y documentar una aplicación monolítica en Node.js que administre una librería en línea con acceso directo a PostgreSQL, sin exponer APIs REST, GraphQL ni SOAP, y sin usar JSON o XML para comunicar el navegador con el servidor. Las vistas se renderizan del lado del servidor con EJS y los formularios HTML envían los datos directamente al monolito.</p>
+      <p>Como máximo puede existir un Administrador, regla reforzada también en PostgreSQL. Los usuarios registrados consultan el catálogo, buscan libros y ven el detalle de cada uno; el Administrador es el único que puede crear, editar y eliminar libros, catálogos, autores, conceptos, imágenes y usuarios. El alcance incluye normalizar el modelo de datos hasta 4FN, desplegar en una instancia real de GCP y publicar la evidencia completa del trabajo.</p>
+    </div></section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>02</span><h2>Análisis de requisitos, actores y riesgos</h2></div>
+      <div class="architecture-copy"><p><code>docs/REQUIREMENTS.md</code> define 7 requisitos funcionales (RF-01 a RF-07: autenticación, catálogo/búsqueda, CRUD normalizado, autorización por rol, relaciones libro–autor/género/concepto, imágenes, y máximo un administrador) y 6 no funcionales (RNF-01 a RNF-06: SQL parametrizado, integridad en PostgreSQL, validación server-side, sesión/CSRF, despliegue y secretos, navegabilidad SSR), cada uno con criterios de aceptación.</p></div>
+      <div class="component-columns">
+        <article><span class="mini-badge">ACTORES</span><h3>Qué puede hacer cada uno</h3>
+          <div class="component-item"><h4>Visitante</h4><p>Solo accede a login y registro. Cualquier ruta de catálogo o administración lo redirige a login (verificado por HTTP real, ver sección 10).</p></div>
+          <div class="component-item"><h4>Usuario registrado</h4><p>Consulta el catálogo, busca por título/ISBN/autor y ve el detalle y los conceptos de cada libro. No puede escribir: verificado que un intento de acceder a rutas de administrador lo redirige sin cambiar datos.</p></div>
+          <div class="component-item"><h4>Administrador (máximo uno)</h4><p>CRUD completo de libros, catálogos, autores, conceptos, imágenes y usuarios. La regla de unicidad está reforzada con un índice único parcial en PostgreSQL, probado con un intento real de crear un segundo administrador (rechazado).</p></div>
+        </article>
+        <article><span class="mini-badge">RIESGOS</span><h3>Identificados desde el análisis</h3>
+          <div class="component-item"><h4>Acceso no autorizado / SQL Injection</h4><p>Mitigado con <code>requireAdmin</code>/<code>requireUser</code> y consultas 100% parametrizadas con <code>pg</code>.</p></div>
+          <div class="component-item"><h4>Subida de archivos peligrosos</h4><p>Mitigado con Multer (tipo, tamaño, nombre generado por el sistema); riesgo residual documentado en <code>SECURITY_REVIEW.md</code>.</p></div>
+          <div class="component-item"><h4>Exposición de credenciales / eliminación accidental</h4><p><code>.env</code> fuera de git; triggers y FKs impiden borrados que dejarían relaciones huérfanas.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>03</span><h2>Arquitectura monolítica y organización del código</h2></div>
+      <div class="architecture-copy"><p>La aplicación vive en <code>apps/web-monolito/</code> y organiza el código por módulos, separando arranque, configuración, middleware, rutas y vistas. El flujo real es: Navegador → NGINX (reverse proxy, puerto 80, prefijo <code>/library</code>) → Node.js/Express (solo <code>127.0.0.1:3000</code>) → módulos internos → PostgreSQL. Presentación, lógica de negocio y acceso a datos están en una sola unidad desplegable: no hay ningún límite de red ni de despliegue entre ellos, aunque el código esté dividido en carpetas por responsabilidad.</p></div>
+      <figure class="essay-figure" style="max-width:900px;margin:0 auto 32px"><img src="../images/diagrama-arquitectura-ejercicio02.png" alt="Diagrama de macro-arquitectura monolítica: Navegador, NGINX, Node.js/Express con sus módulos internos, y PostgreSQL" onerror="this.closest('figure').style.display='none'"><figcaption>Diagrama de macro-arquitectura (<code>docs/ARCHITECTURE_MONOLITHIC.png</code> en el repositorio de trabajo).</figcaption></figure>
+      <div class="component-columns">
+        <article><span class="mini-badge">NÚCLEO</span><h3>Arranque y configuración</h3>
+          <div class="component-item"><h4>app.js / server.js</h4><p>Inicializan Express, Helmet, sesiones en PostgreSQL y CSRF, y montan las rutas bajo <code>BASE_PATH</code>. <code>server.js</code> verifica <code>SELECT 1</code> contra PostgreSQL antes de escuchar, y escucha explícitamente en <code>127.0.0.1</code> (corregido en esta sesión: antes escuchaba en todas las interfaces).</p></div>
+          <div class="component-item"><h4>config/db.js</h4><p>Pool de conexión <code>pg</code> y una función de transacción (BEGIN/COMMIT/ROLLBACK) para operaciones que tocan varias tablas.</p></div>
+          <div class="component-item"><h4>middleware/</h4><p><code>auth.js</code> expone <code>requireUser</code> y <code>requireAdmin</code>, <code>csrf.js</code> valida un token por sesión en cada escritura y <code>errors.js</code> traduce errores de PostgreSQL a mensajes genéricos.</p></div>
+        </article>
+        <article><span class="mini-badge">MÓDULOS</span><h3>Rutas por dominio</h3>
+          <div class="component-item"><h4>modules/auth</h4><p>Login, logout y regeneración de sesión. Probado de punta a punta contra la instancia real (ver sección 10).</p></div>
+          <div class="component-item"><h4>modules/books</h4><p>CRUD de libros, relaciones autor/género, conceptos por libro, imágenes (Multer) y búsqueda. El listado ya consulta directamente la vista <code>v_book_catalog</code> de PostgreSQL.</p></div>
+          <div class="component-item"><h4>modules/catalogs y modules/people</h4><p>CRUD de formatos, categorías y géneros; CRUD de autores y conceptos.</p></div>
+          <div class="component-item"><h4>modules/users</h4><p>CRUD de usuarios y protección contra eliminar la propia cuenta o crear un segundo administrador.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>04</span><h2>Modelo de datos, diagrama ER y normalización hasta 4FN</h2></div>
+      <div class="architecture-copy">
+        <p>El esquema canónico (<code>db/01_schema.sql</code>, idéntico a <code>data/schema.sql</code>) define 11 tablas: <code>formats</code>, <code>categories</code>, <code>genres</code>, <code>authors</code>, <code>users</code>, <code>books</code>, <code>book_authors</code>, <code>book_genres</code>, <code>concepts</code>, <code>book_concepts</code> y <code>book_images</code>. Un libro puede tener varios autores y géneros, varias imágenes (con una sola marcada como portada) y varios conceptos, cada uno con una definición propia de ese libro — la dependencia multivaluada central del ejercicio.</p>
+        <p>Guardar autores, géneros, conceptos e imágenes como columnas repetitivas de <code>books</code> habría producido un producto cartesiano y anomalías de inserción/borrado. Por eso <code>book_authors</code>, <code>book_genres</code> y <code>book_concepts</code> son tablas puente muchos-a-muchos (4FN), y <code>book_images</code> es una entidad dependiente uno-a-muchos del libro con borrado en cascada. El proceso completo 1FN → 2FN → 3FN/BCNF → 4FN, con las dependencias multivaluadas identificadas explícitamente, está en <code>docs/NORMALIZATION_4FN.xlsx</code> (7 hojas) y en <code>docs/NORMALIZATION_4NF.md</code>.</p>
+        <p>Verificado contra datos reales el 2026-08-31: el seed de 30 libros produce <strong>17 conceptos distintos que se repiten en varios libros con una definición propia por par libro-concepto</strong> (por ejemplo "Destino" tiene 6 definiciones distintas según el libro), y exactamente <strong>1</strong> administrador activo y <strong>1</strong> portada por libro — confirmado con consultas SQL reales, no solo revisión estática del script.</p>
+      </div>
+      <figure class="essay-figure" style="max-width:960px;margin:0 auto"><img src="../images/diagrama-er-ejercicio02.png" alt="Diagrama entidad-relación del esquema de la librería: formats, categories, genres, authors, users, books, book_authors, book_genres, concepts, book_concepts y book_images"><figcaption>Diagrama ER real generado a partir de <code>data/schema.sql</code> / <code>db/01_schema.sql</code>.</figcaption></figure>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>05</span><h2>Infraestructura GCP y PostgreSQL</h2></div>
+      <div class="architecture-copy">
+        <p>La aplicación está desplegada en una instancia real de <strong>Google Cloud Compute Engine</strong>: <code>maquina-02</code>, zona <code>northamerica-south1-c</code>, tipo <code>e2-standard-2</code>, imagen <strong>CentOS Stream 10</strong>. Los comandos de creación, firewall y dimensionamiento están documentados en <code>docs/GCP_COMMANDS.md</code>, incluyendo la sección 7 con lo realmente ejecutado el 2026-08-31 (no solo la plantilla de comandos).</p>
+        <p>PostgreSQL corre en la propia instancia con el rol de aplicación <code>library_user</code> (sin privilegios de superusuario, sin poder crear roles ni bases de datos) dueño de la base <code>library_db</code> — principio de mínimo privilegio exigido por el enunciado. Node nunca se ejecuta como superusuario de PostgreSQL.</p>
+        <p>Los 7 scripts de <code>db/</code> se ejecutaron en el orden exacto que exige el enunciado, contra PostgreSQL real, con evidencia capturada de cada paso:</p>
+      </div>
+      <div class="endpoint-grid">
+        <article><code>db/00_create_database.sql</code><p>Rol y base ya existentes en la instancia, verificados con la misma convención de nombres del script.</p></article>
+        <article><code>db/01_schema.sql</code><p>11 tablas, índices y restricciones creadas sin error: <code>BEGIN...CREATE TABLE ×11...CREATE INDEX ×7...COMMIT</code>.</p></article>
+        <article><code>db/02_seed_30_per_table.sql</code><p>30 libros y sus relaciones insertados sin error: <code>INSERT 0 30</code>, <code>INSERT 0 66</code> (conceptos por libro), etc.</p></article>
+        <article><code>db/03_all_quieries_before_stored_procedures.sql</code><p>10 consultas reales ejecutadas, incluida la verificación de administrador único.</p></article>
+        <article><code>db/04_stored_procedures.sql</code><p>5 procedimientos creados; <code>sp_create_book</code> validado de forma independiente con <code>CALL</code> real.</p></article>
+        <article><code>db/05_triggers.sql</code><p>4 triggers creados; se disparan automáticamente en cada escritura real (verificado indirectamente).</p></article>
+        <article><code>db/06_views.sql</code><p>6 vistas creadas; <code>v_book_catalog</code> ya está conectada al listado real de la aplicación.</p></article>
+      </div>
+      <p class="section-note">Durante la primera ejecución real se encontró y corrigió un hueco real en el esquema: <code>books.price</code> aceptaba <code>0</code> porque la restricción original solo exigía <code>price &gt;= 0</code>. Se corrigió a <code>ck_books_price_positive CHECK (price &gt; 0)</code> — detalle completo en <code>docs/ENGINEERING_DECISIONS.md</code>, ED-12.</p>
+      <div class="essay-figures" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:28px">
+        <figure class="essay-figure">
+          <img src="evidencias/psql/01_psql_scripts_00_a_06.png" alt="Ejecución real de los scripts db/00 a db/06 en psql" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Ejecución real de <code>db/00</code> a <code>db/06</code> en <code>psql</code> contra <code>library_db</code>.</figcaption>
+        </figure>
+        <figure class="essay-figure">
+          <img src="evidencias/psql/02_psql_pruebas_integridad.png" alt="Pruebas negativas de integridad ejecutadas en PostgreSQL" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Pruebas de integridad (ISBN duplicado, stock/precio inválidos, FK inexistente, segundo administrador) con el error real de PostgreSQL.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>06</span><h2>Funcionalidades implementadas</h2></div>
+      <div class="endpoint-grid">
+        <article><code>/auth</code><p>Login, logout, sesión almacenada en PostgreSQL y contraseñas con bcrypt. Probado con sesión real de administrador y de usuario común.</p></article>
+        <article><code>/books</code><p>Catálogo (vía vista <code>v_book_catalog</code>), búsqueda por título, ISBN o autor, alta, edición y baja, con autores y géneros múltiples.</p></article>
+        <article><code>/books/:id/concepts</code><p>Alta, edición y baja de conceptos y definiciones específicas por libro — incluye el libro de Cloud Computing con IaaS, PaaS, SaaS, FaaS, Bucket, Public/Private/Hybrid Cloud, Multicloud y Serverless, tal como pide el enunciado.</p></article>
+        <article><code>/books/:id/images</code><p>Carga con Multer (JPEG, PNG, WebP o GIF hasta 5 MB), portada única, edición y borrado.</p></article>
+        <article><code>/catalogs/:type</code><p>CRUD de formatos, categorías y géneros. Eliminar un registro en uso es rechazado por PostgreSQL (verificado con autores, géneros, categorías y conceptos reales).</p></article>
+        <article><code>/manage/:type</code><p>CRUD de autores y conceptos.</p></article>
+        <article><code>/users</code><p>CRUD de usuarios y regla de un solo Administrador, verificada con un intento real de crear un segundo administrador (rechazado por PostgreSQL).</p></article>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>07</span><h2>Seguridad y roles</h2></div>
+      <div class="architecture-copy"><p><code>docs/SECURITY_REVIEW.md</code> documenta once controles con su amenaza, control aplicado y riesgo residual. Estos son algunos, con su estado de verificación real:</p></div>
+      <div class="error-card-grid">
+        <article><h3>Contraseñas</h3><p>Hash con bcrypt (costo 12); riesgo residual medio por falta de política de longitud del lado del servidor.</p></article>
+        <article><h3>Sesiones</h3><p>Sesión en PostgreSQL, cookie httpOnly y sameSite. Se encontró y corrigió un bug real: <code>NODE_ENV=production</code> en el despliegue forzaba cookies <code>secure</code> sobre HTTP simple y anulaba la sesión por completo (ED-13). Verificado corregido con login real.</p></article>
+        <article><h3>Autorización por rol</h3><p><code>requireAdmin</code> protege las rutas de escritura; <code>requireUser</code> protege la consulta del catálogo. Verificado por HTTP real con tres sesiones distintas (administrador, usuario común, visitante).</p></article>
+        <article><h3>SQL Injection</h3><p>Consultas parametrizadas (<code>$1…$n</code>) en todos los módulos de rutas; riesgo residual bajo.</p></article>
+        <article><h3>Secretos y .env</h3><p><code>.env</code> excluido por <code>.gitignore</code>; solo <code>.env.example</code> se versiona, sin valores reales. Verificado que no se filtró ninguna credencial real en este repositorio ni en el de evidencias.</p></article>
+        <article><h3>Carga de imágenes</h3><p>Multer limita tipo declarado y tamaño; riesgo residual alto porque solo valida el MIME informado, no la firma real del archivo.</p></article>
+        <article><h3>Node no expuesto directamente</h3><p>Se encontró y corrigió un bug real: Node escuchaba en todas las interfaces (<code>0.0.0.0</code>) y una regla de firewall exponía el puerto 3000 a Internet. Corregido a <code>127.0.0.1</code> explícito (ED-14); verificado que el puerto 3000 ya no es accesible desde fuera de la instancia.</p></article>
+        <article><h3>Mínimo privilegio en PostgreSQL</h3><p><code>library_user</code> no es superusuario, no puede crear roles ni bases de datos; es dueño solo de sus propios objetos en <code>library_db</code>.</p></article>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>08</span><h2>Evaluación arquitectónica: ¿por qué monolito?</h2></div>
+      <article class="reflection-paper">
+        <p>La arquitectura monolítica server-side con Node.js, Express, EJS y acceso directo a PostgreSQL es adecuada para una librería académica de este alcance: entrega HTML completo, mantiene autenticación, catálogo y administración en un solo proceso, y evita la complejidad de exponer APIs. Su principal ventaja es la baja complejidad operativa: una sola aplicación, una sola base de datos y un solo directorio de uploads, con transacciones que crean o actualizan libros y sus relaciones dentro de la misma base, sin coordinación distribuida — confirmado ahora con un despliegue real de un solo proceso Node detrás de un único reverse proxy.</p>
+        <p>Una solución desacoplada por componentes (por ejemplo una SPA sobre el mismo backend) introduciría un contrato de API, serialización, CORS y autenticación entre orígenes, costos que no se justifican porque el ejercicio exige HTML renderizado en servidor y no requiere clientes móviles ni integraciones públicas. Los microservicios serían todavía menos convenientes: dividir usuarios, catálogo, imágenes y libros obligaría a definir límites de datos y consistencia distribuida sobre relaciones (libro–autor, libro–género, libro–concepto) que hoy son cohesivas y se consultan juntas en una sola transacción PostgreSQL.</p>
+        <p>El monolito conserva límites de escalabilidad y de mantenimiento a largo plazo, pero no son inmediatos para el tamaño de este proyecto: puede escalar verticalmente y, moviendo los uploads a almacenamiento compartido, replicarse detrás de un balanceador. La conclusión de <code>docs/ARCHITECTURAL_EVALUATION.md</code> es que el monolito server-side es la opción proporcional a los requisitos, el tamaño del equipo y el despliegue esperado, y que conviene fortalecer pruebas, validaciones y operación antes de considerar dividir componentes.</p>
+      </article>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>09</span><h2>Despliegue con NGINX bajo /library</h2></div>
+      <div class="architecture-copy">
+        <p>Node.js corre como servicio <code>systemd</code> (<code>library-web.service</code>, con reinicio automático ante fallos y arranque en el boot de la instancia) escuchando <strong>únicamente en <code>127.0.0.1:3000</code></strong>. NGINX se instaló en la instancia y publica <code>/library</code> mediante un <code>location</code> que reenvía a Node sin recortar el prefijo, ya que la propia aplicación lo espera completo (variable <code>BASE_PATH=/library</code>).</p>
+        <p>Verificación real ejecutada el 2026-08-31, desde fuera de la instancia, sin usar su navegador local:</p>
+        <ul class="production-grid">
+          <li><code>curl http://34.51.61.250/library</code> → <code>301</code>, y siguiendo la redirección se obtiene el HTML real del catálogo con los 30 libros del seed.</li>
+          <li><code>curl http://34.51.61.250:3000/library</code> (puerto directo, sin pasar por NGINX) → sin conexión: Node ya no es alcanzable directamente desde Internet.</li>
+          <li>Login, logout y las tres pruebas de autorización (administrador, usuario común, visitante) se ejecutaron contra esta misma instancia y bajo este mismo prefijo, con cookies y token CSRF reales.</li>
+        </ul>
+        <p class="section-note">Configuración completa de <code>systemd</code> y de NGINX reproducida en <code>docs/GCP_COMMANDS.md</code> (sección 7).</p>
+      </div>
+      <div class="essay-figures" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:20px">
+        <figure class="essay-figure">
+          <img src="evidencias/deploy/01_curl_externo_library.png" alt="Verificación externa de http://IP/library respondiendo con el catálogo real" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Acceso externo real a <code>/library</code> vía reverse proxy NGINX.</figcaption>
+        </figure>
+        <figure class="essay-figure">
+          <img src="evidencias/app/02_login_y_catalogo_navegador.png" alt="Captura de navegador real del login y catálogo bajo /library" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Pendiente: captura de navegador real (login y catálogo) — la app ya está verificada por HTTP, falta la captura visual.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>10</span><h2>Plan y resultados de pruebas</h2></div>
+      <div class="architecture-copy">
+        <p><code>docs/TEST_PLAN.md</code> define 22 casos de prueba ligados a los requisitos RF-01 a RF-07 y RNF-01 a RNF-06. Cada caso registra requisito, precondición, entrada, pasos, resultado esperado, resultado observado y evidencia requerida.</p>
+        <p>Estado real al 2026-08-31: <strong>11 de los 22 casos en <code>PASSED</code></strong> (antes de esta sesión eran solo 2), todos con evidencia HTTP o SQL real, no simulada:</p>
+      </div>
+      <div class="comparison-grid">
+        <article><span class="mini-badge">PASSED</span><h3>Verificado con evidencia real</h3><ul>
+          <li>CP-01 Login válido — sesión real reconocida tras <code>POST /auth/login</code>.</li>
+          <li>CP-03 Logout — sesión invalidada, ruta protegida vuelve a redirigir a login.</li>
+          <li>CP-08 Rechazo de libro inválido — ISBN, stock, precio y FK inexistente rechazados por PostgreSQL.</li>
+          <li>CP-10 Restricción al eliminar catálogos referenciados — autor, género, categoría y concepto.</li>
+          <li>CP-12 / CP-13 Autorización — usuario común y visitante correctamente denegados.</li>
+          <li>CP-14 Segundo administrador — rechazado por el índice único real.</li>
+          <li>CP-18 ISBN duplicado y cascada de borrado de libro con relaciones reales.</li>
+          <li>CP-20 Exclusión de secretos del repositorio.</li>
+          <li>CP-21 Verificación sintáctica de Node.js.</li>
+          <li>CP-22 Despliegue bajo <code>/library</code> vía NGINX, verificado desde fuera de la instancia.</li>
+        </ul></article>
+        <article class="final-version"><span class="mini-badge">PENDING</span><h3>Requiere navegador real o no se alcanzó a probar</h3><ul>
+          <li>CRUD completo desde el formulario web (creación de libro por HTTP tuvo un rechazo de CSRF en el script de prueba automatizado, sin confirmar si es un bug real; pendiente de repetir desde un navegador).</li>
+          <li>Subida de imágenes, edición de libro y CRUD de catálogos/personas/usuarios por interfaz web.</li>
+          <li>Casos de usabilidad y navegación que requieren interacción visual.</li>
+        </ul></article>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>11</span><h2>Decisiones de ingeniería, problemas encontrados y soluciones</h2></div>
+      <div class="architecture-copy"><p><code>docs/ENGINEERING_DECISIONS.md</code> registra 16 decisiones con el esquema necesidad → alternativas → decisión → justificación → riesgo → evidencia. Las más relevantes de esta sesión, con acceso real a PostgreSQL/GCP por primera vez:</p></div>
+      <div class="prompt-grid">
+        <article class="iteration-card"><span class="mini-badge">ED-12</span><h3>Precio de libro en 0 no se rechazaba</h3><p>La restricción original permitía <code>price = 0</code>. Corregida a <code>price &gt; 0</code> tras encontrarlo en la primera ejecución real de las pruebas de integridad.</p></article>
+        <article class="iteration-card"><span class="mini-badge">ED-13</span><h3>Cookies de sesión no llegaban al cliente</h3><p><code>NODE_ENV=production</code> en el despliegue forzaba cookies <code>secure</code> sin TLS, y <code>express-session</code> las omitía por completo. Diagnosticado con reproducciones mínimas aisladas y corregido.</p></article>
+        <article class="iteration-card"><span class="mini-badge">ED-14</span><h3>Node expuesto en todas las interfaces</h3><p><code>server.js</code> no fijaba el host de escucha; corregido a <code>127.0.0.1</code> explícito, cumpliendo la Parte 8 del enunciado.</p></article>
+        <article class="iteration-card"><span class="mini-badge">ED-11</span><h3>Vistas y procedimientos: conexión parcial</h3><p>El listado de libros ya usa <code>v_book_catalog</code>; <code>sp_create_book</code> se validó de forma independiente contra datos reales. Conectar por completo las rutas de escritura a los procedimientos quedó documentado como pendiente por límite de tiempo, no probado a ciegas.</p></article>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>12</span><h2>Uso de IA como herramienta de ingeniería</h2></div>
+      <div class="prompt-grid">
+        <article class="iteration-card" style="grid-column:1/-1"><span class="mini-badge">MEJORA AUTORIZADA</span><h3>Búsqueda parametrizada de libros</h3>
+          <h4>Necesidad</h4><p>El catálogo solo permitía listar todos los libros y no localizar registros por título, ISBN o autor.</p>
+          <h4>Prompt utilizado (conservado en docs/PROMPT_MAESTRO_IA.md)</h4><p>"Trabaja únicamente sobre la aplicación existente en apps/web-monolito. Implementa una sola mejora pequeña y de bajo riesgo: agrega en GET /books una búsqueda server-side por título, ISBN o nombre completo del autor. Conserva Express, EJS, PostgreSQL y pg; no agregues API ni dependencias. Usa parámetros de PostgreSQL para todos los valores aportados por el usuario... Modifica sólo apps/web-monolito/src/modules/books/routes.js y apps/web-monolito/src/views/books/index.ejs."</p>
+          <h4>Decisión, riesgo y verificación</h4><p>Se modificaron exclusivamente esos dos archivos, usando ILIKE con parámetros $1/$2 (sin concatenar SQL). Riesgo evaluado como bajo. Documentado con trazabilidad completa en <code>docs/AI_CHANGELOG.md</code>.</p>
+        </article>
+        <article class="iteration-card" style="grid-column:1/-1"><span class="mini-badge">SESIÓN CON GCP REAL</span><h3>Diagnóstico y corrección de bugs reales de despliegue</h3>
+          <h4>Necesidad</h4><p>Con acceso real a PostgreSQL/GCP disponible por primera vez, correr los 7 scripts de <code>db/</code> y desplegar la aplicación de verdad, corrigiendo lo que fallara en el camino en vez de dejarlo como suposición estática.</p>
+          <h4>Qué se hizo y cómo se verificó</h4><p>Se ejecutaron los scripts SQL en orden real, se encontraron y corrigieron 3 bugs reales (precio inválido no rechazado, cookies de sesión rotas por <code>NODE_ENV</code>, Node expuesto en todas las interfaces), y se desplegó con <code>systemd</code> + NGINX, verificado con <code>curl</code> real desde fuera de la instancia. Cada corrección se probó de inmediato contra PostgreSQL/HTTP real antes de darla por buena; ninguna se reportó como hecha sin ejecutarla. Detalle completo, con los comandos y errores reales, en <code>docs/ENGINEERING_DECISIONS.md</code> (ED-12 a ED-16) y <code>docs/PROGRESS.md</code>.</p>
+        </article>
+      </div>
+      <p class="section-note">Documentado con trazabilidad completa en <code>docs/PROMPT_MAESTRO_IA.md</code>, <code>docs/AI_PROMPT_HISTORY.md</code> y <code>docs/AI_CHANGELOG.md</code>, siguiendo el esquema necesidad → alternativas → decisión → justificación → riesgo → evidencia de validación.</p>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>13</span><h2>Galería de evidencias</h2></div>
+      <div class="architecture-copy"><p>Espacios preparados para las capturas reales que aún hacen falta. Cada figura ya tiene la ruta exacta donde debe guardarse la imagen; mientras no exista el archivo, el espacio simplemente no se muestra (no rompe la página).</p></div>
+      <div class="evidence-gallery">
+        <figure><img src="evidencias/psql/01_psql_scripts_00_a_06.png" alt="Ejecución de db/00 a db/06 en psql" onerror="this.closest('figure').style.display='none'"><figcaption>Scripts db/00–06 en psql</figcaption></figure>
+        <figure><img src="evidencias/psql/02_psql_pruebas_integridad.png" alt="Pruebas de integridad en psql" onerror="this.closest('figure').style.display='none'"><figcaption>Pruebas de integridad</figcaption></figure>
+        <figure><img src="evidencias/app/01_login.png" alt="Pantalla de login de la aplicación" onerror="this.closest('figure').style.display='none'"><figcaption>Login (navegador)</figcaption></figure>
+        <figure><img src="evidencias/app/02_catalogo.png" alt="Catálogo de libros bajo /library" onerror="this.closest('figure').style.display='none'"><figcaption>Catálogo bajo /library</figcaption></figure>
+        <figure><img src="evidencias/app/03_crud_libro.png" alt="Formulario de creación o edición de libro" onerror="this.closest('figure').style.display='none'"><figcaption>CRUD de libro</figcaption></figure>
+        <figure><img src="evidencias/app/04_conceptos_cloud.png" alt="Conceptos de Cloud Computing asociados al libro" onerror="this.closest('figure').style.display='none'"><figcaption>Conceptos de Cloud Computing</figcaption></figure>
+        <figure><img src="evidencias/app/05_imagenes.png" alt="Gestión de imágenes de un libro" onerror="this.closest('figure').style.display='none'"><figcaption>Gestión de imágenes</figcaption></figure>
+        <figure><img src="evidencias/deploy/01_curl_externo_library.png" alt="Acceso externo a /library" onerror="this.closest('figure').style.display='none'"><figcaption>Acceso externo a /library</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>14</span><h2>Conclusiones y mejoras futuras</h2></div>
+      <div class="architecture-copy">
+        <p>El ejercicio permitió llevar el modelo de librería desde el análisis de requisitos hasta un despliegue real en GCP, con PostgreSQL ejecutado y probado de verdad — no solo diseñado en papel. El proceso de correr los scripts contra una base real reveló bugs que la validación estática nunca hubiera encontrado (una restricción de precio incompleta, una configuración de despliegue que rompía las sesiones, y un binding de red inseguro), lo que confirma el valor de las pruebas de integridad reales que exige el enunciado.</p>
+        <p>Mejoras futuras identificadas: completar la conexión de <code>POST/PUT /books</code> a <code>sp_create_book</code>/<code>sp_update_book</code> (ED-11); ampliar la matriz de pruebas a los 22 casos completos con navegador real; agregar TLS si la publicación final lo requiere (lo que reactivaría la necesidad de cookies <code>secure</code>, ver ED-13); y limpiar manualmente la regla de firewall <code>monolito-web</code>, ya inofensiva pero innecesaria.</p>
+      </div>
+    </section>
+
+    <section class="architecture-section"><div class="architecture-heading"><span>15</span><h2>Descargas y documentos</h2></div>
+      <div class="architecture-copy"><p>Enlaces directos a los artefactos del repositorio de trabajo (<code>integracion02</code>). El proyecto completo compactado en <code>.tar.gz</code> (sin <code>.env</code>, <code>node_modules</code> ni uploads reales) se agrega en <code>descargas/</code> antes de la publicación final en ubiquitous.udem.edu.</p></div>
+      <ul class="production-grid">
+        <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/tree/main/db">Scripts SQL (db/00 a db/06)</a></li>
+        <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/REQUIREMENTS.md">Requisitos (REQUIREMENTS.md)</a></li>
+        <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/ENGINEERING_DECISIONS.md">Decisiones de ingeniería (16 entradas)</a></li>
+        <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/SECURITY_REVIEW.md">Revisión de seguridad (11 controles)</a></li>
+        <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/TEST_PLAN.md">Matriz de pruebas (22 casos, 11 PASSED)</a></li>
+        <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/NORMALIZATION_4FN.xlsx">Normalización 4FN (.xlsx)</a></li>
+        <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/GCP_COMMANDS.md">Comandos GCP + despliegue real ejecutado</a></li>
+        <li><a href="descargas/ejercicio02.tar.gz">Proyecto completo (.tar.gz) — pendiente de generar antes de publicar</a></li>
+      </ul>
+    </section>
+
+    <p class="integrity-note">Página de evidencias del Ejercicio Guiado 02. URL de este ejercicio: se define al publicar en ubiquitous.udem.edu. Última actualización: 31 de agosto de 2026. Versión: borrador post-despliegue real (PostgreSQL y GCP verificados; capturas de navegador y publicación final en ubiquitous.udem.edu pendientes). Contenido respaldado por el repositorio de trabajo <code>integracion02</code>.</p>
+    <div class="back-links"><a class="back" href="../parcial1.html">← regresar a Parcial 1</a><a class="back" href="../index.html">← regresar al inicio</a></div>
+  </main>
+</body>
+</html>

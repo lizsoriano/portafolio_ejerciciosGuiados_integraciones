@@ -82,7 +82,7 @@
         <article><code>db/01_schema.sql</code><p>11 tablas, índices y restricciones creadas sin error: <code>BEGIN...CREATE TABLE ×11...CREATE INDEX ×7...COMMIT</code>.</p></article>
         <article><code>db/02_seed_30_per_table.sql</code><p>30 libros y sus relaciones insertados sin error: <code>INSERT 0 30</code>, <code>INSERT 0 66</code> (conceptos por libro), etc.</p></article>
         <article><code>db/03_all_quieries_before_stored_procedures.sql</code><p>10 consultas reales ejecutadas, incluida la verificación de administrador único.</p></article>
-        <article><code>db/04_stored_procedures.sql</code><p>5 procedimientos creados; <code>sp_create_book</code> validado de forma independiente con <code>CALL</code> real.</p></article>
+        <article><code>db/04_stored_procedures.sql</code><p>5 procedimientos creados; 4 de ellos (<code>sp_create_book</code>, <code>sp_update_book</code>, <code>sp_upsert_book_concept</code>, <code>sp_set_book_cover_image</code>) están conectados y en uso real desde <code>routes.js</code>.</p></article>
         <article><code>db/05_triggers.sql</code><p>4 triggers creados; se disparan automáticamente en cada escritura real (verificado indirectamente).</p></article>
         <article><code>db/06_views.sql</code><p>6 vistas creadas; <code>v_book_catalog</code> ya está conectada al listado real de la aplicación.</p></article>
       </div>
@@ -182,7 +182,7 @@
         <article class="iteration-card"><span class="mini-badge">ED-12</span><h3>Precio de libro en 0 no se rechazaba</h3><p>La restricción original permitía <code>price = 0</code>. Corregida a <code>price &gt; 0</code> tras encontrarlo en la primera ejecución real de las pruebas de integridad.</p></article>
         <article class="iteration-card"><span class="mini-badge">ED-13</span><h3>Cookies de sesión no llegaban al cliente</h3><p><code>NODE_ENV=production</code> en el despliegue forzaba cookies <code>secure</code> sin TLS, y <code>express-session</code> las omitía por completo. Diagnosticado con reproducciones mínimas aisladas y corregido.</p></article>
         <article class="iteration-card"><span class="mini-badge">ED-14</span><h3>Node expuesto en todas las interfaces</h3><p><code>server.js</code> no fijaba el host de escucha; corregido a <code>127.0.0.1</code> explícito, cumpliendo la Parte 8 del enunciado.</p></article>
-        <article class="iteration-card"><span class="mini-badge">ED-11</span><h3>Vistas y procedimientos: conexión parcial</h3><p>El listado de libros ya usa <code>v_book_catalog</code>; <code>sp_create_book</code> se validó de forma independiente contra datos reales. Conectar por completo las rutas de escritura a los procedimientos quedó documentado como pendiente por límite de tiempo, no probado a ciegas.</p></article>
+        <article class="iteration-card"><span class="mini-badge">ED-11</span><h3>Vistas, procedimientos y triggers: conexión completa</h3><p>El listado de libros usa <code>v_book_catalog</code>; crear/editar libro, agregar concepto y cambiar portada de imagen invocan <code>sp_create_book</code>, <code>sp_update_book</code>, <code>sp_upsert_book_concept</code> y <code>sp_set_book_cover_image</code> respectivamente; los triggers se disparan automáticamente. Probado de punta a punta por HTTP real contra la instancia GCP.</p></article>
       </div>
     </section>
 
@@ -226,7 +226,7 @@
     <section class="architecture-section"><div class="architecture-heading"><span>14</span><h2>Conclusiones y mejoras futuras</h2></div>
       <div class="architecture-copy">
         <p>El ejercicio permitió llevar el modelo de librería desde el análisis de requisitos hasta un despliegue real en GCP, con PostgreSQL ejecutado y probado de verdad — no solo diseñado en papel. El proceso de correr los scripts contra una base real reveló bugs que la validación estática nunca hubiera encontrado (una restricción de precio incompleta, una configuración de despliegue que rompía las sesiones, y un binding de red inseguro), lo que confirma el valor de las pruebas de integridad reales que exige el enunciado.</p>
-        <p>Mejoras futuras identificadas: completar la conexión de <code>POST/PUT /books</code> a <code>sp_create_book</code>/<code>sp_update_book</code> (ED-11); ampliar la matriz de pruebas a los 22 casos completos con navegador real; y agregar TLS si la publicación final lo requiere (lo que reactivaría la necesidad de cookies <code>secure</code>, ver ED-13).</p>
+        <p>Mejoras futuras identificadas: conectar también los catálogos/personas/usuarios a procedimientos almacenados equivalentes (hoy usan SQL parametrizado directo, ya que son operaciones de una sola tabla); y agregar TLS si la publicación final lo requiere (lo que reactivaría la necesidad de cookies <code>secure</code>, ver ED-13).</p>
       </div>
     </section>
 
@@ -240,7 +240,7 @@
         <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/TEST_PLAN.md">Matriz de pruebas (22 casos, 22 PASSED)</a></li>
         <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/NORMALIZATION_4FN.xlsx">Normalización 4FN (.xlsx)</a></li>
         <li><a href="https://github.com/lizsoriano/ejercicio-guiado02-con-el-que-trabajara-claude/blob/main/docs/GCP_COMMANDS.md">Comandos GCP + despliegue real ejecutado</a></li>
-        <li><a href="descargas/ejercicio02.tar.gz">Proyecto completo (.tar.gz) — pendiente de generar antes de publicar</a></li>
+        <li><a href="descargas/ejercicio02.tar.gz">Proyecto completo (.tar.gz), sin .env ni node_modules</a></li>
       </ul>
     </section>
 
